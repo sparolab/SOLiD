@@ -121,3 +121,8 @@
 
 ## License
 * For academic usage, the code is released under the BSD 3.0 license. For any commercial purpose, please contact the authors.
+  
+### Contributors 
+<a href="https://github.com/sparolab/SOLiD/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=sparolab/SOLiD" />
+</a>
