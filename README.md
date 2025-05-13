@@ -25,6 +25,7 @@
 </div>
 
 ## NEWS
+* [May, 2025] [SOLiD-SLAM](https://github.com/hogyun2/solid-slam) package will be released soon. Stay Tuned!!
 * [May, 2025] We will present our paper at ICRA 2025.
 * [November, 2024] Now, [Distributed-SOLiD-SLAM](https://github.com/sparolab/Distributed-SOLiD-SLAM.git) code is released!!
 * [September, 2024] SOLiD is introduced in [HeLiPR-Place-Recognition Toolbox](https://github.com/minwoo0611/HeLiPR-Place-Recognition.git)!!
