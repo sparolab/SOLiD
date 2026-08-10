@@ -1,0 +1,19 @@
+# SOLiD profile: RGB-D / foundation-model SLAM (GS-ICP, LoopSplat, VGGT-SLAM).
+# Feed a point cloud back-projected from the keyframe depth / predicted point map,
+# gravity/pose-aligned (SOLiD assumes a Z-up frame; a camera is Z-forward).
+# Indoor scale, and a *wide* vertical FOV because a world-aligned dense camera
+# cloud spans floor↔ceiling (unlike a LiDAR's narrow FOV). Tune per scene.
+# Tuned on TUM fr3_long_office_household (recall 0.72 -> 0.82):
+#   max_range 12 (office structure extends ~12m; 8 was too short),
+#   num_height 24 (more vertical resolution). Re-tune per scene scale.
+fov_up: 15.0
+fov_down: -15.0
+num_angle: 60
+num_range: 40
+num_height: 40
+min_range: 0.1
+max_range: 10.0
+voxel_size: 0.05
+use_weight: false
+knn: 30
+min_similarity: 0.0

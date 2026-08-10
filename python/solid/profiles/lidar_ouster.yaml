@@ -1,0 +1,12 @@
+# SOLiD profile: Ouster OS1-64 (symmetric ~±16.6° vertical FOV).
+fov_up: 16.6
+fov_down: -16.6
+num_angle: 60
+num_range: 40
+num_height: 64
+min_range: 3.0
+max_range: 80.0
+voxel_size: 0.4
+use_weight: false
+knn: 30
+min_similarity: 0.0

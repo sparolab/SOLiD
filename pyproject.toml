@@ -1,0 +1,26 @@
+[build-system]
+requires = ["scikit-build-core>=0.8", "pybind11>=2.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "solid"
+version = "0.1.0"
+description = "SOLiD: Spatially Organized and Lightweight Global Descriptor (C++ core + pure-Python)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "GPL-3.0" }
+dependencies = ["numpy", "pyyaml"]
+
+[project.urls]
+Homepage = "https://github.com/sparolab/SOLiD"
+
+[tool.scikit-build]
+# Package source lives in python/solid → import name `solid`.
+# Non-.py data (profiles/*.yaml) under the package is included automatically.
+wheel.packages = ["python/solid"]
+cmake.version = ">=3.16"
+minimum-version = "0.8"
+
+# One-line install works from the repo root (cpp/ is in the build tree):
+#   pip install .                                  # from a clone
+#   pip install git+https://github.com/sparolab/SOLiD.git
