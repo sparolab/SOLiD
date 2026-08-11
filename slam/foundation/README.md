@@ -1,35 +1,18 @@
 <div align="center">
   <h1>SOLiD x VGGT-SLAM</h1>
-  <a href="https://arxiv.org/abs/2606.25386"><img src="https://img.shields.io/badge/arXiv-2606.25386-b31b1b?logo=arxiv&logoColor=white" alt="arXiv" /></a>
-  <a href="https://sparolab.github.io/research/commerge/"><img src="https://img.shields.io/badge/Project-Commerge-6f42c1" alt="Commerge" /></a>
-  <a href="https://youtu.be/LV_8_jZbHV8"><img src="https://img.shields.io/badge/YouTube-Video-FF0000?logo=youtube&logoColor=white" alt="YouTube" /></a>
+  <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-2408.07330-b31b1b?logo=arxiv&logoColor=white" alt="arXiv" /></a>
+  <a href="https://sparolab.github.io/research/solid/"><img src="https://img.shields.io/badge/Project-Commerge-6f42c1" alt="SOLiDxVGGT-SLAM" /></a>
+  <a href=""><img src="https://img.shields.io/badge/YouTube-Video-FF0000?logo=youtube&logoColor=white" alt="YouTube" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSD--3--Clause-green" alt="BSD 3-Clause License" /></a>
   <br />
   <br />
   <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?background=0D1117&color=22C55E&font=Fira+Code&size=14&duration=4500&pause=1000&center=true&vCenter=true&width=680&height=24&lines=SOLiD+meets+VGGT+SLAM%21" alt="tagline"/>
+  <img src="https://readme-typing-svg.demolab.com?background=0D1117&color=22C55E&font=Fira+Code&size=14&duration=4500&pause=1000&center=true&vCenter=true&width=200&height=24&lines=SOLiD+meets+VGGT+SLAM%21" alt="tagline"/>
   </p>
 </div>
 
 <div align="center">
   <img src="assets/vggt_solid_slam.gif" width="720"/>
-</div>
-
-
-
-
-
-
-Geometry-only SOLiD place recognition integrated into
-[VGGT-SLAM 2.0](https://github.com/MIT-SPARK/VGGT-SLAM). VGGT's predicted depth is
-unprojected into a camera-frame point cloud; SOLiD retrieves loop candidates from
-geometry only. RGB and intensity are disabled. VGGT-SLAM still estimates the loop
-constraint and performs its normal SL(4) pose-graph optimization.
-
-<div align="center">
-  <img src="assets/vggt_solid_slam.gif" width="720"/>
-  <br/>
-  <sub>Common dense office map with trajectory/camera wireframes before (red) and after (green) loop closure.</sub>
 </div>
 
 ## Result
