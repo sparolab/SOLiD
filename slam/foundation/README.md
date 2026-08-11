@@ -7,7 +7,7 @@ geometry only. RGB and intensity are disabled. VGGT-SLAM still estimates the loo
 constraint and performs its normal SL(4) pose-graph optimization.
 
 <div align="center">
-  <img src="assets/office_loop_before_after.gif" width="720"/>
+  <img src="assets/vggt_solid_slam.gif" width="720"/>
   <br/>
   <sub>Common dense office map with trajectory/camera wireframes before (red) and after (green) loop closure.</sub>
 </div>
@@ -35,7 +35,6 @@ feature. `SOLID_MIN_SUBMAP_GAP=50` prevents adjacent-submap matches.
 |---|---|
 | `vggt_slam/pluggable_retrieval.py` | SALAD/NetVLAD/SOLiD retrieval backends and radius gate |
 | `vggt_slam/o3d_loop_vis.py` | capture loop-before/loop-after maps and camera wireframes |
-| `evals/render_o3d_loop_gif.py` | render both trajectories on one dense map, including slow figure-eight orbit |
 | `vggt_slam_integration.patch` | changes required in VGGT-SLAM `main.py` and `solver.py` |
 | `HANDOFF_solid_loop_closure.md` | experiments, reasoning, and detailed handoff |
 
@@ -46,7 +45,6 @@ From a clean VGGT-SLAM checkout:
 ```bash
 git apply /path/to/SOLiD/slam/foundation/vggt_slam_integration.patch
 cp /path/to/SOLiD/slam/foundation/vggt_slam/*.py vggt_slam/
-cp /path/to/SOLiD/slam/foundation/evals/render_o3d_loop_gif.py evals/
 pip install -e /path/to/SOLiD
 ```
 
@@ -71,21 +69,5 @@ To capture loop-before/after snapshots, append:
 --o3d_lc_vis --o3d_lc_no_window --o3d_lc_dir o3d_loop_vis --o3d_lc_voxel 0.03
 ```
 
-## Render the trajectory overlay
-
-The following uses z-up coordinates, dense map points, strong elevation amplitude,
-and one slow vertical cycle per orbit:
-
-```bash
-python evals/render_o3d_loop_gif.py \
-  --before o3d_loop_vis/loop_01_before.npz \
-  --after o3d_loop_vis/loop_01_after.npz \
-  --map vggt_solid_poses_points.pcd --map-voxel 0.01 --cam-stride 2 \
-  --camera-to-z-up --orbit-path figure8 \
-  --elev 10 --elev-amp 28 --elev-cycles 1 \
-  --frames 120 --fps 20 --point-size 2.0 \
-  --out office_loop_before_after.gif
-```
-
-The elevation varies smoothly from `-18°` to `+38°`. The displayed dense map is
-VGGT-SLAM's common reconstruction, not an externally measured ground-truth map.
+The visualization above uses VGGT-SLAM's common dense reconstruction, not an
+externally measured ground-truth map.
