@@ -15,6 +15,75 @@
   <img src="assets/vggt_solid_slam.gif" width="720"/>
 </div>
 
+## :package: Installation
+
+> [!NOTE]
+> SOLiD runs on the CPU, but VGGT-SLAM requires an NVIDIA GPU and CUDA-enabled
+> PyTorch. The integration has been tested with Python 3.11.
+
+### 1. Install VGGT-SLAM
+
+Clone VGGT-SLAM and create its conda environment:
+
+```bash
+git clone https://github.com/MIT-SPARK/VGGT-SLAM.git
+cd VGGT-SLAM
+
+conda create -n vggt-slam python=3.11 -y
+conda activate vggt-slam
+
+chmod +x setup.sh
+./setup.sh
+```
+
+The VGGT-SLAM setup script installs its model dependencies and downloads the
+required third-party packages. See the upstream
+[installation guide](https://github.com/MIT-SPARK/VGGT-SLAM#installation-of-vggt-slam)
+for platform-specific requirements.
+
+### 2. Install SOLiD
+
+Clone SOLiD inside the VGGT-SLAM checkout and install it into the same conda
+environment:
+
+```bash
+git clone https://github.com/sparolab/SOLiD.git third_party/SOLiD
+pip install -e third_party/SOLiD
+```
+
+The SOLiD package builds its lightweight C++ core and installs the Python module
+as `solid`. No learned weights or additional GPU dependencies are required.
+
+### 3. Apply the VGGT-SLAM integration
+
+Run these commands from the VGGT-SLAM root directory:
+
+```bash
+git apply third_party/SOLiD/slam/foundation/vggt_slam_integration.patch
+cp third_party/SOLiD/slam/foundation/vggt_slam/*.py vggt_slam/
+```
+
+The patch adds `--retrieval {salad,netvlad,solid}` to VGGT-SLAM and connects
+SOLiD to VGGT's predicted geometry. It is based on VGGT-SLAM commit `35327ac`.
+
+> [!WARNING]
+> Apply the patch to a clean VGGT-SLAM checkout. If upstream `main.py` or
+> `vggt_slam/solver.py` has changed, check out `35327ac` before applying it:
+>
+> ```bash
+> git checkout 35327ac
+> ```
+
+### 4. Verify the installation
+
+```bash
+python -c "import solid; print('SOLiD import: OK')"
+python main.py --help | grep retrieval
+```
+
+The first command should print `SOLiD import: OK`; the second should list the
+`salad`, `netvlad`, and `solid` retrieval backends.
+
 ## Result
 
 On the bundled `office_loop` sequence (473 frames), the validated configuration
@@ -40,18 +109,6 @@ feature. `SOLID_MIN_SUBMAP_GAP=50` prevents adjacent-submap matches.
 | `vggt_slam/o3d_loop_vis.py` | capture loop-before/loop-after maps and camera wireframes |
 | `vggt_slam_integration.patch` | changes required in VGGT-SLAM `main.py` and `solver.py` |
 | `HANDOFF_solid_loop_closure.md` | experiments, reasoning, and detailed handoff |
-
-## Install into VGGT-SLAM
-
-From a clean VGGT-SLAM checkout:
-
-```bash
-git apply /path/to/SOLiD/slam/foundation/vggt_slam_integration.patch
-cp /path/to/SOLiD/slam/foundation/vggt_slam/*.py vggt_slam/
-pip install -e /path/to/SOLiD
-```
-
-The patch is based on VGGT-SLAM commit `35327ac`.
 
 ## Reproduce the validated office loop
 
