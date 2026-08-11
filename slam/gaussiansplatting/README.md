@@ -4,9 +4,9 @@ SOLiD as the **loop-closure place recognizer** for [LoopSplat](https://github.co
 (RGB-D Gaussian-Splatting SLAM). Drop-in replacement for LoopSplat's NetVLAD.
 
 <div align="center">
-  <img src="assets/solidsplat.gif" width="520"/>
+  <img src="assets/solidsplat.gif" width="720"/>
   <br/>
-  <img src="assets/label.png" width="380"/>
+  <img src="assets/label.png" width="500"/>
 </div>
 
 <p align="center"><sub>TUM fr3/office — the green (optimized) cameras snap onto the black GT the moment SOLiD detects the loop.</sub></p>
@@ -81,6 +81,17 @@ python run_slam_lc.py --detector salad
 SOLiD is **competitive with the visual descriptors while being 5–20× faster and
 CPU-only** — its real edge, on top of its native LiDAR/radar modality.
 
+### Compute — a like-for-like comparison (everything in PyTorch)
+
+<div align="center"><img src="assets/compute_comparison.png" width="860"/></div>
+
+`solid_torch.py` runs the *same* SOLiD algorithm as a torch op (matches the
+C++/numpy backend, cos = 1.0), so it can be timed against the learned descriptors
+on equal footing. SOLiD's `rsolid` is **0.48 MFLOPs — ~23,000× less than DINOv2
+and ~190,000× less than SALAD** — and it is the fastest on **both** CPU and GPU.
+Its compute is so small that a GPU gives no benefit (kernel-launch overhead > the
+work), whereas the visual nets *need* a GPU. Reproduce: `python benchmark_compute.py`.
+
 ---
 
 ## Files
@@ -91,6 +102,8 @@ CPU-only** — its real edge, on top of its native LiDAR/radar modality.
 | `solid_loopsplat.py` | `SolidLoopClosure` — SOLiD drop-in (floor-gravity, mean-removal, yaw-ICP) |
 | `visual_loopsplat.py` | DINOv2 / SALAD variants (for the comparison) |
 | `tune_auto.py` | fast recall/separation sweep of the `gs_rgbd` profile |
+| `solid_torch.py` | SOLiD rsolid as a PyTorch op (CPU/GPU), matches the C++ backend |
+| `benchmark_compute.py` | FLOPs + CPU/GPU latency comparison (the plot above) |
 | `benchmark_pr.py` | per-descriptor timing benchmark |
 | `make_map_cam_gif_o3d.py` | the map + before/after camera GIF above |
 | `viser_view.py` | interactive viser viewer of a run's map + trajectory |
