@@ -21,13 +21,27 @@
 > SOLiD runs on the CPU, but VGGT-SLAM requires an NVIDIA GPU and CUDA-enabled
 > PyTorch. The integration has been tested with Python 3.11.
 
-### 1. Install VGGT-SLAM
+### 1. Clone SOLiD with VGGT-SLAM
 
-Clone VGGT-SLAM and create its conda environment:
+VGGT-SLAM is included as a Git submodule pinned to the tested SOLiD integration:
 
 ```bash
-git clone https://github.com/MIT-SPARK/VGGT-SLAM.git
-cd VGGT-SLAM
+git clone --recurse-submodules --branch test https://github.com/sparolab/SOLiD.git
+cd SOLiD
+```
+
+If SOLiD was cloned without `--recurse-submodules`, initialize VGGT-SLAM with:
+
+```bash
+git submodule update --init --recursive
+```
+
+### 2. Install VGGT-SLAM
+
+Create its conda environment and run the upstream setup script:
+
+```bash
+cd slam/foundation/VGGT-SLAM
 
 conda create -n vggt-slam python=3.11 -y
 conda activate vggt-slam
@@ -41,38 +55,21 @@ required third-party packages. See the upstream
 [installation guide](https://github.com/MIT-SPARK/VGGT-SLAM#installation-of-vggt-slam)
 for platform-specific requirements.
 
-### 2. Install SOLiD
+### 3. Install SOLiD
 
-Clone SOLiD inside the VGGT-SLAM checkout and install it into the same conda
-environment:
+Install SOLiD from the parent repository into the same conda environment:
 
 ```bash
-git clone https://github.com/sparolab/SOLiD.git third_party/SOLiD
-pip install -e third_party/SOLiD
+pip install -e ../../..
 ```
 
 The SOLiD package builds its lightweight C++ core and installs the Python module
 as `solid`. No learned weights or additional GPU dependencies are required.
 
-### 3. Apply the VGGT-SLAM integration
-
-Run these commands from the VGGT-SLAM root directory:
-
-```bash
-git apply third_party/SOLiD/slam/foundation/vggt_slam_integration.patch
-cp third_party/SOLiD/slam/foundation/vggt_slam/*.py vggt_slam/
-```
-
-The patch adds `--retrieval {salad,netvlad,solid}` to VGGT-SLAM and connects
-SOLiD to VGGT's predicted geometry. It is based on VGGT-SLAM commit `35327ac`.
-
-> [!WARNING]
-> Apply the patch to a clean VGGT-SLAM checkout. If upstream `main.py` or
-> `vggt_slam/solver.py` has changed, check out `35327ac` before applying it:
->
-> ```bash
-> git checkout 35327ac
-> ```
+The VGGT-SLAM submodule already contains the integration: no patching or manual
+file copying is required. It tracks the `solid-foundation` branch of
+[`hogyun2/VGGT-SLAM`](https://github.com/hogyun2/VGGT-SLAM/tree/solid-foundation)
+and is pinned to a tested commit for reproducibility.
 
 ### 4. Verify the installation
 
@@ -105,9 +102,9 @@ feature. `SOLID_MIN_SUBMAP_GAP=50` prevents adjacent-submap matches.
 
 | File | Purpose |
 |---|---|
-| `vggt_slam/pluggable_retrieval.py` | SALAD/NetVLAD/SOLiD retrieval backends and radius gate |
-| `vggt_slam/o3d_loop_vis.py` | capture loop-before/loop-after maps and camera wireframes |
-| `vggt_slam_integration.patch` | changes required in VGGT-SLAM `main.py` and `solver.py` |
+| `VGGT-SLAM/` | tested VGGT-SLAM integration, pinned as a Git submodule |
+| `VGGT-SLAM/vggt_slam/pluggable_retrieval.py` | SALAD/NetVLAD/SOLiD retrieval backends and radius gate |
+| `VGGT-SLAM/vggt_slam/o3d_loop_vis.py` | capture loop-before/loop-after maps and camera wireframes |
 | `HANDOFF_solid_loop_closure.md` | experiments, reasoning, and detailed handoff |
 
 ## Reproduce the validated office loop

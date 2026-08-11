@@ -1,0 +1,4 @@
+[submodule "slam/foundation/VGGT-SLAM"]
+	path = slam/foundation/VGGT-SLAM
+	url = https://github.com/hogyun2/VGGT-SLAM.git
+	branch = solid-foundation
