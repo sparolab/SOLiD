@@ -1,5 +1,7 @@
 # Multi-session SLAM guide
 
+<p align="center"><img src="../fig/solid_multi_session.gif" alt="Two LiDAR sessions (left) and three 4D radar sessions (right) aligned into one map by SOLiD" width="95%" /></p>
+
 Align runs recorded on different days into one map. Every SOLiD front-end saves its run as a session (`save_dir` on the ROS nodes, `--out` on the macOS tool, see the [run guide](GUIDE.md#output-a-session)). The alignment node loads two or more sessions and expresses all of them in the frame of the first one (the central session):
 
 1. **Retrieval**: every keyframe of a session searches the central session's SOLiD descriptors.
