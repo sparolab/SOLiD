@@ -26,9 +26,10 @@
 #include <Eigen/Geometry>
 
 #include "solid/descriptor.hpp"
-#include "solid_slam/loop_detector.hpp"
+#include "solid/slam/loop_detector.hpp"
 
-namespace solid_slam {
+namespace solid {
+namespace slam {
 
 // Scan Context as in SC-LIO-SAM / LT-SLAM: max height (+ lidar_height) per ring x sector bin.
 inline Eigen::MatrixXd make_scan_context(const std::vector<Eigen::Vector3f>& pts,
@@ -149,6 +150,7 @@ class SessionWriter {
   std::string dir_;
 };
 
-}  // namespace solid_slam
+}  // namespace slam
+}  // namespace solid
 
 #endif  // SOLID_SLAM_SESSION_WRITER_HPP

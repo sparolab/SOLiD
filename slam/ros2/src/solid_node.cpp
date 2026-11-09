@@ -18,9 +18,9 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include "solid_ros/msg/loop_candidate.hpp"
-#include "solid_slam/config_yaml.hpp"
-#include "solid_slam/loop_detector.hpp"
-#include "solid_slam/session_writer.hpp"
+#include "solid/slam/config_yaml.hpp"
+#include "solid/slam/loop_detector.hpp"
+#include "solid/slam/session_writer.hpp"
 
 namespace {
 
@@ -66,9 +66,9 @@ class SolidNode : public rclcpp::Node {
     const std::string config = declare_parameter<std::string>("config", "");
     save_dir_ = declare_parameter<std::string>("save_dir", "");
     if (config.empty()) throw std::runtime_error("parameter 'config' is empty");
-    params_ = solid_slam::load_params(config);
-    detector_ = std::make_unique<solid_slam::LoopDetector>(params_);
-    session_ = std::make_unique<solid_slam::SessionWriter>(save_dir_);
+    params_ = solid::slam::load_params(config);
+    detector_ = std::make_unique<solid::slam::LoopDetector>(params_);
+    session_ = std::make_unique<solid::slam::SessionWriter>(save_dir_);
 
     pub_loops_ = create_publisher<solid_ros::msg::LoopCandidate>("solid/loop_candidates", 100);
     pub_markers_ = create_publisher<visualization_msgs::msg::MarkerArray>(
@@ -104,7 +104,7 @@ class SolidNode : public rclcpp::Node {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
     if (!detector_->is_keyframe(pose)) return;
 
-    solid_slam::CloudView view;
+    solid::slam::CloudView view;
     view.data = cloud->data.data();
     view.num_points = static_cast<std::size_t>(cloud->width) * cloud->height;
     view.point_step = cloud->point_step;
@@ -128,7 +128,7 @@ class SolidNode : public rclcpp::Node {
                            params_.weight_field.c_str());
 
     const Eigen::Isometry3d world_to_body = pose.inverse();
-    solid_slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
+    solid::slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
                           session_->enabled() ? &intensity_ : nullptr);
 
     const auto t0 = std::chrono::steady_clock::now();
@@ -188,9 +188,9 @@ class SolidNode : public rclcpp::Node {
     pub_markers_->publish(arr);
   }
 
-  solid_slam::Params params_;
-  std::unique_ptr<solid_slam::LoopDetector> detector_;
-  std::unique_ptr<solid_slam::SessionWriter> session_;
+  solid::slam::Params params_;
+  std::unique_ptr<solid::slam::LoopDetector> detector_;
+  std::unique_ptr<solid::slam::SessionWriter> session_;
   std::string save_dir_;
   std::vector<Eigen::Vector3f> pts_;
   std::vector<float> w_, intensity_;

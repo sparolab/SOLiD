@@ -1,0 +1,23 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(Eigen3)
+if(@SOLID_USE_PCL@)
+  find_dependency(PCL COMPONENTS common filters)
+endif()
+if(@yaml-cpp_FOUND@)
+  find_dependency(yaml-cpp)
+endif()
+if(@SOLID_BUILD_MULTI_SESSION@)
+  find_dependency(PCL COMPONENTS common filters io registration)
+  find_dependency(GTSAM)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/solidTargets.cmake")
+
+foreach(_comp ${solid_FIND_COMPONENTS})
+  if(NOT TARGET solid::${_comp})
+    set(solid_FOUND FALSE)
+    set(solid_NOT_FOUND_MESSAGE "solid component '${_comp}' was not built/installed")
+  endif()
+endforeach()

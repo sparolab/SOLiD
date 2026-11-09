@@ -1,0 +1,4 @@
+{
+  "name": "solid_multi_session",
+  "type": "ros.ament_cmake"
+}

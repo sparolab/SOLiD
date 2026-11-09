@@ -17,9 +17,9 @@
 #include <visualization_msgs/MarkerArray.h>
 
 #include "solid_ros/LoopCandidate.h"
-#include "solid_slam/config_yaml.hpp"
-#include "solid_slam/loop_detector.hpp"
-#include "solid_slam/session_writer.hpp"
+#include "solid/slam/config_yaml.hpp"
+#include "solid/slam/loop_detector.hpp"
+#include "solid/slam/session_writer.hpp"
 
 namespace {
 
@@ -55,9 +55,9 @@ class SolidNode {
     std::string config;
     pnh.param<std::string>("config", config, std::string(SOLID_CONFIG_DIR) + "/kitti.yaml");
     pnh.param<std::string>("save_dir", save_dir_, "");
-    params_ = solid_slam::load_params(config);
-    detector_ = std::make_unique<solid_slam::LoopDetector>(params_);
-    session_ = std::make_unique<solid_slam::SessionWriter>(save_dir_);
+    params_ = solid::slam::load_params(config);
+    detector_ = std::make_unique<solid::slam::LoopDetector>(params_);
+    session_ = std::make_unique<solid::slam::SessionWriter>(save_dir_);
 
     pub_loops_ = pnh.advertise<solid_ros::LoopCandidate>("loop_candidates", 100);
     pub_markers_ = pnh.advertise<visualization_msgs::MarkerArray>("markers", 1, true);
@@ -89,7 +89,7 @@ class SolidNode {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
     if (!detector_->is_keyframe(pose)) return;
 
-    solid_slam::CloudView view;
+    solid::slam::CloudView view;
     view.data = cloud->data.data();
     view.num_points = static_cast<std::size_t>(cloud->width) * cloud->height;
     view.point_step = cloud->point_step;
@@ -112,7 +112,7 @@ class SolidNode {
                         params_.weight_field.c_str());
 
     const Eigen::Isometry3d world_to_body = pose.inverse();
-    solid_slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
+    solid::slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
                           session_->enabled() ? &intensity_ : nullptr);
 
     const ros::WallTime t0 = ros::WallTime::now();
@@ -170,9 +170,9 @@ class SolidNode {
     pub_markers_.publish(arr);
   }
 
-  solid_slam::Params params_;
-  std::unique_ptr<solid_slam::LoopDetector> detector_;
-  std::unique_ptr<solid_slam::SessionWriter> session_;
+  solid::slam::Params params_;
+  std::unique_ptr<solid::slam::LoopDetector> detector_;
+  std::unique_ptr<solid::slam::SessionWriter> session_;
   std::string save_dir_;
   std::vector<Eigen::Vector3f> pts_;
   std::vector<float> w_, intensity_;

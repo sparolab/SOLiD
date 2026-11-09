@@ -1,0 +1,40 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/PointCloud2
+      Name: Map
+      Enabled: true
+      Topic: /solid_multi_session/map
+      Color Transformer: Intensity
+      Use rainbow: true
+      Size (Pixels): 2
+      Style: Points
+      Alpha: 0.6
+    - Class: rviz/MarkerArray
+      Name: Trajectories
+      Enabled: true
+      Marker Topic: /solid_multi_session/paths
+    - Class: rviz/MarkerArray
+      Name: Inter-session loops
+      Enabled: true
+      Marker Topic: /solid_multi_session/loops
+  Global Options:
+    Background Color: 255; 255; 255
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/MoveCamera
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 400
+      Pitch: 0.9
+      Name: Current View
+  Value: true
+Window Geometry:
+  Height: 900
+  Width: 1200

@@ -2,14 +2,22 @@ FROM ros:humble-perception
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libeigen3-dev libyaml-cpp-dev ros-humble-rviz2 \
+      libeigen3-dev libyaml-cpp-dev ros-humble-gtsam ros-humble-rviz2 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /ros2_ws/src/SOLiD
+
+# 1. The SOLiD library (cpp/): solid::core, solid::slam, solid::multi_session.
+RUN . /opt/ros/humble/setup.sh \
+    && cmake -S /ros2_ws/src/SOLiD/cpp -B /tmp/solid_build -DCMAKE_BUILD_TYPE=Release \
+      -DSOLID_USE_PCL=OFF -DSOLID_BUILD_MULTI_SESSION=ON \
+    && cmake --build /tmp/solid_build -j4 && cmake --install /tmp/solid_build && rm -rf /tmp/solid_build
+
+# 2. ROS 2 packages find it with find_package(solid). --base-paths skips the ROS 1 packages.
 WORKDIR /ros2_ws
-# --base-paths keeps colcon from also picking up the ROS 1 package.
 RUN . /opt/ros/humble/setup.sh && \
-    colcon build --base-paths src/SOLiD/slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+    colcon build --base-paths src/SOLiD/slam/ros2 src/SOLiD/multi_session_slam/ros2 \
+      --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 RUN echo "source /ros2_ws/install/setup.bash" >> /root/.bashrc
 CMD ["bash"]

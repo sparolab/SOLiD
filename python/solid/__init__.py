@@ -19,14 +19,16 @@ from . import pure
 
 try:
     from ._core import Candidate, Config, Database, Descriptor, Extractor  # noqa: F401
+    from ._core import slam  # noqa: F401  (C++ keyframe/loop detector + session writer)
     backend = "cpp"
 except ImportError:  # compiled extension not built — fall back to pure Python
     from .pure import Candidate, Config, Database, Descriptor, Extractor  # noqa: F401
     backend = "python"
+    slam = None  # solid.slam needs the compiled core
 
 # Parameters are managed via YAML config (bundled profiles or a custom path).
 from .config_io import list_profiles, load_config  # noqa: E402
 
 __all__ = ["Config", "Descriptor", "Candidate", "Extractor", "Database",
-           "pure", "backend", "load_config", "list_profiles"]
+           "pure", "slam", "backend", "load_config", "list_profiles"]
 __version__ = "0.1.0"

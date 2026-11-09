@@ -1,5 +1,6 @@
 // pybind11 binding of the SOLiD C++ core (../cpp).
-// Exposes Config / Descriptor / Candidate / Extractor / Database to Python.
+// Exposes Config / Descriptor / Candidate / Extractor / Database, and the
+// solid::slam keyframe/loop detector and session writer as solid.slam.
 // Built PCL-free (internal voxel) so the wheel is light and importable anywhere.
 #include <stdexcept>
 #include <vector>
@@ -13,6 +14,8 @@
 #include "solid/database.hpp"
 #include "solid/descriptor.hpp"
 #include "solid/extractor.hpp"
+#include "solid/slam/loop_detector.hpp"
+#include "solid/slam/session_writer.hpp"
 
 namespace py = pybind11;
 using namespace solid;
@@ -44,6 +47,19 @@ Descriptor extractNp(
     throw std::runtime_error("weights length must match number of points");
   }
   return e.extract(p, &w);
+}
+
+Eigen::Isometry3d toIso(const Eigen::Matrix4d& m) {
+  Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
+  T.matrix() = m;
+  return T;
+}
+
+std::vector<float> optFloats(const py::object& o, std::size_t n, const char* what) {
+  if (o.is_none()) return {};
+  std::vector<float> v = o.cast<std::vector<float>>();
+  if (v.size() != n) throw std::runtime_error(std::string(what) + " length must match number of points");
+  return v;
 }
 
 }  // namespace
@@ -99,4 +115,68 @@ PYBIND11_MODULE(_core, m) {
       .def("query", &Database::query, py::arg("descriptor"))
       .def("size", &Database::size)
       .def("empty", &Database::empty);
+
+  // ---- solid.slam : the same keyframe/loop logic and session writer as the ROS nodes ----
+  py::module_ sm = m.def_submodule("slam", "Keyframe/loop detection and LT-mapper sessions (solid::slam)");
+  using solid::slam::LoopDetector;
+  using solid::slam::Params;
+  using solid::slam::SessionWriter;
+  py::class_<Params>(sm, "Params")
+      .def(py::init<>())
+      .def_readwrite("solid", &Params::solid)
+      .def_readwrite("keyframe_dist", &Params::keyframe_dist)
+      .def_readwrite("keyframe_angle_deg", &Params::keyframe_angle_deg)
+      .def_readwrite("exclude_recent", &Params::exclude_recent)
+      .def_readwrite("min_score", &Params::min_score)
+      .def_readwrite("max_candidates", &Params::max_candidates)
+      .def_readwrite("cloud_in_world", &Params::cloud_in_world)
+      .def_readwrite("weight_field", &Params::weight_field);
+  py::class_<solid::slam::Loop>(sm, "Loop")
+      .def_readonly("query_id", &solid::slam::Loop::query_id)
+      .def_readonly("match_id", &solid::slam::Loop::match_id)
+      .def_readonly("score", &solid::slam::Loop::score)
+      .def_readonly("yaw_rad", &solid::slam::Loop::yaw_rad);
+  py::class_<LoopDetector>(sm, "LoopDetector")
+      .def(py::init<const Params&>(), py::arg("params"))
+      .def("is_keyframe", [](const LoopDetector& d, const Eigen::Matrix4d& pose) {
+             return d.is_keyframe(toIso(pose));
+           }, py::arg("pose"))
+      .def("add_keyframe",
+           [](LoopDetector& d, double stamp, const Eigen::Matrix4d& pose,
+              const py::array_t<float, py::array::c_style | py::array::forcecast>& pts,
+              py::object weights) {
+             const auto p = npToPoints(pts);
+             const auto w = optFloats(weights, p.size(), "weights");
+             return d.add_keyframe(stamp, toIso(pose), p, w.empty() ? nullptr : &w);
+           },
+           py::arg("stamp"), py::arg("pose"), py::arg("points"), py::arg("weights") = py::none())
+      .def_property_readonly("num_keyframes", [](const LoopDetector& d) { return d.keyframes().size(); })
+      .def_property_readonly("stamps", [](const LoopDetector& d) {
+        std::vector<double> s;
+        for (const auto& k : d.keyframes()) s.push_back(k.stamp);
+        return s;
+      })
+      .def_property_readonly("poses", [](const LoopDetector& d) {
+        std::vector<Eigen::Matrix4d> s;
+        for (const auto& k : d.keyframes()) s.push_back(k.pose.matrix());
+        return s;
+      })
+      .def_property_readonly("loops", &LoopDetector::loops)
+      .def("last_descriptor", &LoopDetector::last_descriptor)
+      .def("save", &LoopDetector::save, py::arg("dir"));
+  py::class_<SessionWriter>(sm, "SessionWriter")
+      .def(py::init<std::string>(), py::arg("dir"))
+      .def("add_keyframe",
+           [](SessionWriter& w, std::size_t id,
+              const py::array_t<float, py::array::c_style | py::array::forcecast>& pts,
+              py::object intensity, const Descriptor& d) {
+             const auto p = npToPoints(pts);
+             w.add_keyframe(id, p, optFloats(intensity, p.size(), "intensity"), d);
+           },
+           py::arg("id"), py::arg("points"), py::arg("intensity"), py::arg("descriptor"))
+      .def("finish", &SessionWriter::finish, py::arg("detector"));
+  sm.def("make_scan_context",
+         [](const py::array_t<float, py::array::c_style | py::array::forcecast>& pts) {
+           return solid::slam::make_scan_context(npToPoints(pts));
+         }, py::arg("points"));
 }

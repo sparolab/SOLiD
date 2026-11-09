@@ -7,9 +7,10 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "solid_slam/loop_detector.hpp"
+#include "solid/slam/loop_detector.hpp"
 
-namespace solid_slam {
+namespace solid {
+namespace slam {
 
 namespace detail {
 template <typename T>
@@ -55,6 +56,7 @@ inline Params load_params(const std::string& path) {
   return p;
 }
 
-}  // namespace solid_slam
+}  // namespace slam
+}  // namespace solid
 
 #endif  // SOLID_SLAM_CONFIG_YAML_HPP

@@ -1,15 +1,24 @@
 FROM osrf/ros:noetic-desktop-full
 
 ENV DEBIAN_FRONTEND=noninteractive
-# cmake >= 3.16 is already in Ubuntu 20.04; Eigen and yaml-cpp come with ROS.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      libeigen3-dev libyaml-cpp-dev python3-catkin-tools \
+# GTSAM 4.0 from the borglab PPA (multi-session SLAM); Eigen, PCL and yaml-cpp come with ROS.
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common \
+    && add-apt-repository -y ppa:borglab/gtsam-release-4.0 && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       libeigen3-dev libyaml-cpp-dev libgtsam-dev libgtsam-unstable-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /catkin_ws/src/SOLiD
-# Only the ROS 1 package: hide the ROS 2 one from catkin (ros2/ has CATKIN_IGNORE).
+
+# 1. The SOLiD library (cpp/): solid::core, solid::slam, solid::multi_session.
+RUN cmake -S /catkin_ws/src/SOLiD/cpp -B /tmp/solid_build -DCMAKE_BUILD_TYPE=Release \
+      -DSOLID_USE_PCL=OFF -DSOLID_BUILD_MULTI_SESSION=ON \
+    && cmake --build /tmp/solid_build -j4 && cmake --install /tmp/solid_build && rm -rf /tmp/solid_build
+
+# 2. ROS 1 packages (solid_ros, solid_multi_session) find it with find_package(solid).
+#    The ROS 2 packages carry CATKIN_IGNORE.
 WORKDIR /catkin_ws
-RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release
+RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release -j4
 
 RUN echo "source /catkin_ws/devel/setup.bash" >> /root/.bashrc
 CMD ["bash"]

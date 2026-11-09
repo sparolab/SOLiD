@@ -1,13 +1,11 @@
-// SOLiD loop detector shared by the ROS 1 and ROS 2 nodes (no ROS dependency).
+// SOLiD loop detector (solid::slam, no ROS dependency). The ROS 1 node, the ROS 2
+// node and the Python package (solid.slam, used by slam/mac) all run this class.
 //
 // Feed it one (pose, cloud) pair per scan. It picks keyframes by travelled
 // distance / rotation, builds a SOLiD descriptor for each keyframe and returns
 // loop candidates against keyframes that are at least `exclude_recent`
 // keyframes old. Registration and pose-graph optimization are left to the SLAM
 // that consumes the candidates.
-//
-// The Mac tool (slam/mac/solid_loops.py) implements the same logic in Python
-// and reads the same YAML files in slam/config/.
 #ifndef SOLID_SLAM_LOOP_DETECTOR_HPP
 #define SOLID_SLAM_LOOP_DETECTOR_HPP
 
@@ -29,7 +27,8 @@
 #include "solid/descriptor.hpp"
 #include "solid/extractor.hpp"
 
-namespace solid_slam {
+namespace solid {
+namespace slam {
 
 struct Params {
   solid::Config solid;          // descriptor + database (slam/config/*.yaml `solid:`)
@@ -200,6 +199,7 @@ class LoopDetector {
   solid::Descriptor last_;
 };
 
-}  // namespace solid_slam
+}  // namespace slam
+}  // namespace solid
 
 #endif  // SOLID_SLAM_LOOP_DETECTOR_HPP

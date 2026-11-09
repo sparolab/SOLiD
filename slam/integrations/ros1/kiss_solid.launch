@@ -1,0 +1,30 @@
+<launch>
+  <!-- KISS-ICP v0.3.0 (ROS 1) + SOLiD loop candidates.
+       /kiss/frame is the deskewed, range-cropped scan in the cloud's own frame (published only
+       with visualize:=true); /kiss/odometry is the pose of that frame, same stamp. -->
+  <arg name="topic" default="/sparkal1/lidar_points" />
+  <arg name="solid_config" default="vlp16" />
+  <arg name="save_dir" default="" />
+
+  <node pkg="kiss_icp" type="odometry_node" name="odometry_node" output="log">
+    <remap from="pointcloud_topic" to="$(arg topic)" />
+    <param name="odom_frame" value="odom" />
+    <param name="base_frame" value="" />
+    <param name="publish_odom_tf" value="false" />
+    <param name="visualize" value="true" />
+    <param name="max_range" value="100.0" />
+    <param name="min_range" value="1.6" />
+    <param name="deskew" value="false" />  <!-- the Kimera-Multi VLP-16 clouds have no per-point time field; v0.3.0 throws -->
+    <param name="max_points_per_voxel" value="20" />
+    <param name="initial_threshold" value="2.0" />
+    <param name="min_motion_th" value="0.1" />
+  </node>
+
+  <include file="$(find solid_ros)/launch/solid.launch">
+    <arg name="config" value="$(arg solid_config)" />
+    <arg name="cloud_topic" value="/kiss/frame" />
+    <arg name="odom_topic" value="/kiss/odometry" />
+    <arg name="save_dir" value="$(arg save_dir)" />
+    <arg name="rviz" value="false" />
+  </include>
+</launch>

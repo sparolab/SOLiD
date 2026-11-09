@@ -1,0 +1,29 @@
+# Velodyne VLP-16 (vertical FOV +-15 deg, 16 rings). Tuned on Kimera-Multi campus_outdoor sparkal1
+# (1.15 km, GT revisits) with FAST-LIO and KISS-ICP, ROS 1 and ROS 2.
+# Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
+
+solid:
+  fov_up: 15.0          # deg
+  fov_down: -15.0       # deg
+  num_angle: 60         # A-SOLiD bins (yaw)
+  num_range: 40         # R-SOLiD bins (20 was worse: AP 0.26 vs 0.36)
+  num_height: 16        # = ring count (8 and 32 gave the same AP)
+  min_range: 1.6        # m, also drops the human pilot walking behind the robot
+  max_range: 80.0       # m (50 was worse: AP 0.19)
+  voxel_size: 0.4       # m (0.2 similar, 0 = no downsampling collapses: AP 0.01)
+  use_weight: false
+  knn: 30
+  min_similarity: 0.0
+
+keyframe:
+  dist: 1.0
+  angle_deg: 10.0
+
+loop:
+  exclude_recent: 50
+  min_score: 0.98       # precision ~0.67-0.76 (4 runs); 0.985 -> 0.70-0.89 with ~half the loops
+  max_candidates: 1
+
+input:
+  cloud_in_world: false # the clouds must be in the LiDAR frame (z up), see config/GUIDE.md
+  weight_field: ""

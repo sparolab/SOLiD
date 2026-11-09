@@ -1,28 +1,35 @@
-# SOLiD core (cpp)
+# SOLiD library (cpp)
 
-Modality-neutral **SOLiD** descriptor library — pure C++ (Eigen + PCL), no ROS.
-This is the single C++ source of truth: the `ros/`, `ros2/` and `python/`
-front-ends and every `slam/<type>/` integration consume it.
+The single C++ source of truth. The Python package, the ROS 1 / ROS 2 nodes, the
+Mac tool and multi-session SLAM all link these targets; none of them has its own
+copy of the algorithm.
 
-Scope: **place recognition** — descriptor extraction + KD-tree retrieval
-(loop candidate + yaw + score). Registration and pose-graph optimization are
-done by the downstream SLAM (see repo-root README).
+| Target | What | Needs |
+| --- | --- | --- |
+| `solid::core` | descriptor extraction + KD-tree retrieval (`Extractor`, `Database`) | Eigen (PCL optional) |
+| `solid::slam` | keyframes and loop candidates (`slam::LoopDetector`), LT-mapper session writer (`slam::SessionWriter`), YAML loader | header-only; yaml-cpp for the loader |
+| `solid::multi_session` | session loading, SOLiD inter-session search, GICP check, consensus, GTSAM graph (`ms::Aligner`) | PCL, GTSAM, yaml-cpp |
+
+```bash
+cmake -S . -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_MULTI_SESSION=ON
+cmake --build build -j && sudo cmake --install build
+```
+```cmake
+find_package(solid REQUIRED COMPONENTS slam multi_session)
+target_link_libraries(my_app solid::multi_session)
+```
 
 ## Layout
 
 ```
 cpp/
 ├── include/solid/
-│   ├── config.hpp      # Config: every param runtime-configurable (LiDAR/radar/GS profiles)
-│   ├── descriptor.hpp  # Descriptor {rsolid, asolid}, Candidate {id, score, yaw_rad}
-│   ├── extractor.hpp   # Extractor: points(+weight) -> Descriptor  (+ loopSimilarity / poseYawDeg)
-│   └── database.hpp    # Database: KD-tree retrieval over rsolid, re-scored by cosine + yaw
-├── src/{extractor,database}.cpp
-├── third_party/nanoflann.hpp   # vendored (v1.3.0)
-└── test/
-    ├── verify_golden.cpp       # regression vs frozen golden descriptors (no gtest needed)
-    ├── test_solid_core.cpp     # gtest unit tests (opt-in)
-    └── data/{golden/*, pcd/*}  # frozen ground-truth + sample KITTI scans
+│   ├── config.hpp, descriptor.hpp, extractor.hpp, database.hpp   # solid::core
+│   ├── slam/            loop_detector.hpp, session_writer.hpp, config_yaml.hpp
+│   └── multi_session/   session.hpp, aligner.hpp, params_yaml.hpp
+├── src/                 extractor.cpp, database.cpp, multi_session/*.cpp
+├── third_party/nanoflann.hpp
+└── test/                verify_golden.cpp (needs SOLID_USE_PCL=ON), test_solid_core.cpp
 ```
 
 ## Design notes

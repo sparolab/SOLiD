@@ -18,13 +18,15 @@ find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(yaml-cpp REQUIRED)
 
-# SOLiD core from this repository (Eigen only, no PCL).
-set(SOLID_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
-set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)
-add_subdirectory(${SOLID_ROOT}/cpp ${CMAKE_CURRENT_BINARY_DIR}/solid_core EXCLUDE_FROM_ALL)
+# SOLiD library (cpp/): an installed copy (find_package) or this repository's tree.
+find_package(solid 0.2 CONFIG QUIET COMPONENTS slam)
+if(NOT solid_FOUND)
+  set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
+  set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../cpp ${CMAKE_CURRENT_BINARY_DIR}/solid EXCLUDE_FROM_ALL)
+endif()
+set(SOLID_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../config)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   msg/LoopCandidate.msg
@@ -32,13 +34,12 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 rosidl_get_typesupport_target(SOLID_MSGS ${PROJECT_NAME} rosidl_typesupport_cpp)
 
 add_executable(solid_node src/solid_node.cpp)
-target_include_directories(solid_node PRIVATE ${SOLID_ROOT}/slam/common/include)
-target_link_libraries(solid_node solid::core yaml-cpp ${SOLID_MSGS})
+target_link_libraries(solid_node solid::slam ${SOLID_MSGS})
 ament_target_dependencies(solid_node
   rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs message_filters)
 
 install(TARGETS solid_node DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch rviz DESTINATION share/${PROJECT_NAME})
-install(DIRECTORY ${SOLID_ROOT}/slam/config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY ${SOLID_CONFIG_DIR}/ DESTINATION share/${PROJECT_NAME}/config)
 
 ament_package()

@@ -1,0 +1,26 @@
+# SOLiD multi-session alignment. Read by the ROS 1 and ROS 2 nodes.
+
+retrieval:
+  min_score: 0.99        # min R-SOLiD cosine similarity of a candidate (same scale as slam/config)
+  knn: 30                # KD-tree neighbours re-scored per query
+  candidate_stride: 1    # test every N-th query keyframe
+  max_verifications: 100 # GICP-check at most this many candidates, highest scores first
+
+verification:            # GICP between keyframe submaps, SOLiD yaw as the initial guess
+  submap_keyframes: 5    # +- keyframes merged around each loop keyframe
+  scan_voxel: 0.4        # m, voxel of the loaded keyframe scans
+  icp_voxel: 1.0         # m, voxel of the submaps fed to GICP
+  icp_max_dist: 2.0      # m, max correspondence distance
+  icp_max_fitness: 0.3   # m^2, mean squared residual to accept a loop
+
+consensus:               # loops must agree on one central <- query transform
+  trans: 3.0             # m
+  rot_deg: 5.0           # deg
+  min_inliers: 3         # fewer: the session is left unaligned
+
+graph:                   # GTSAM pose graph, Cauchy kernel on loops
+  odom_sigma_trans: 0.1
+  odom_sigma_rot_deg: 1.0
+  loop_sigma_trans: 0.5
+  loop_sigma_rot_deg: 3.0
+  iterations: 100

@@ -6,14 +6,15 @@
   <br />
   <a href="https://github.com/sparolab/SOLiD/tree/main/cpp"><img src="https://img.shields.io/badge/-C++-blue?logo=cplusplus" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/python"><img src="https://img.shields.io/badge/Python-3670A0?logo=python&logoColor=ffdd54" /></a>
-  <a href="#ros-1--ros-2"><img src="https://img.shields.io/badge/ROS-Noetic-blue" /></a>
-  <a href="#ros-1--ros-2"><img src="https://img.shields.io/badge/ROS2-Humble-blue" /></a>
-  <a href="#macos-no-ros"><img src="https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white" /></a>
+  <a href="https://github.com/sparolab/SOLiD/tree/main/slam/ros1"><img src="https://img.shields.io/badge/ROS-Noetic-blue" /></a>
+  <a href="https://github.com/sparolab/SOLiD/tree/main/slam/ros2"><img src="https://img.shields.io/badge/ROS2-Humble-blue" /></a>
+  <a href="https://github.com/sparolab/SOLiD/tree/main/slam/mac"><img src="https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white" /></a>
   <a href="#docker"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" /></a>
   <br />
   <a href="https://sparolab.github.io/research/solid/"><img src="https://img.shields.io/badge/Project-Page-blue" /></a>
   <a href="https://ieeexplore.ieee.org/abstract/document/10629042"><img src="https://img.shields.io/badge/Paper-IEEE%20RA--L-yellow" /></a>
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
+  <a href="https://www.dropbox.com/scl/fo/qgsj4cj03vziul4e0xnbr/AD1KSBVdeMMk6rUpFaxD8kE?rlkey=7ecyaowj1lhtjfatnei4pd3ye&dl=0"><img src="https://img.shields.io/badge/Dataset-Dropbox-0061FF?logo=dropbox&logoColor=white" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
   <br />
   <img src="fig/solid_demo.gif" alt="SOLiD on KITTI 00: the map builds up, the trajectory rises with time, and each loop SOLiD finds links the current pose down to the place it recognized" width="95%" />
@@ -25,58 +26,48 @@
 
 ______________________________________________________________________
 
-SOLiD is a lightweight global descriptor for LiDAR and 4D radar place recognition, built for sensors whose field of view is narrow or partly blocked (solid-state LiDAR, sensor fusion rigs, robot bodies in the way).
+A robot recognizes where it has been before, even when its sensor sees only a narrow or partly blocked slice of the world:
+
+- :dart: **FOV-aware**: points are binned by range, elevation and azimuth inside the sensor's real vertical field of view.
+- :compass: **Two signatures**: R-SOLiD (range) finds the place, A-SOLiD (azimuth) recovers the yaw between the two visits.
+- :zap: **Lightweight**: about 1.5 ms per keyframe on a CPU, with no GPU and no training.
+- :satellite: **Any range sensor**: LiDAR counts points; 4D radar can weight each point by its return power.
+- :world_map: **From one run to many**: loop candidates for your SLAM, and [multi-session SLAM](multi_session_slam/GUIDE.md) that aligns separate runs.
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="fig/features_dark.svg" />
-    <img src="fig/features_light.svg" alt="FOV-aware bins, two signatures (range for retrieval, azimuth for yaw), milliseconds on a CPU, LiDAR or 4D radar" width="100%" />
+    <img src="fig/features_light.svg" alt="FOV-aware bins, two signatures (range for retrieval, azimuth for yaw), milliseconds on a CPU, LiDAR or 4D radar" width="95%" />
   </picture>
 </p>
 
-<p align="center"><img src="fig/method.png" alt="SOLiD descriptor" width="85%" /></p>
+## :floppy_disk: Datasets
 
-## :package: What is in this repository
-
-| Folder | What it is | Runs on |
-| --- | --- | --- |
-| [`cpp/`](cpp) | SOLiD core library (Eigen only, PCL optional) | Linux, macOS |
-| [`python/`](python) | `pip install` package: C++ binding, plus a pure-NumPy fallback | Linux, macOS |
-| [`slam/ros1/`](slam/ros1) | Loop candidate node for ROS 1 Noetic | Ubuntu 20.04 |
-| [`slam/ros2/`](slam/ros2) | Loop candidate node for ROS 2 Humble | Ubuntu 22.04 |
-| [`slam/mac/`](slam/mac) | Offline loop detection on rosbags or KITTI, no ROS needed | macOS, Linux |
-| [`multi_session_slam/`](multi_session_slam) | Align sessions saved by the tools above ([LT-mapper](https://github.com/gisbi-kim/lt-mapper)) | ROS 1 (Docker) |
-
-The ROS nodes and the Mac tool share one keyframe and loop logic ([`slam/common`](slam/common)) and one set of sensor configs ([`slam/config`](slam/config): `kitti`, `ouster64`, `radar_4d`). They find loop candidates only. Registration and pose-graph optimization stay in your SLAM.
+KITTI 00 as ROS bags (`/cloud`, `/odom` with ground-truth poses), ready for every example below, is on **[Dropbox](https://www.dropbox.com/scl/fo/qgsj4cj03vziul4e0xnbr/AD1KSBVdeMMk6rUpFaxD8kE?rlkey=7ecyaowj1lhtjfatnei4pd3ye&dl=0)**: `kitti00.bag` (ROS 1, 730 MB), `kitti00_ros2/` (ROS 2, 735 MB) and `kitti00_loop.bag` (a 112 MB cut that returns to the start). They are derived from the [KITTI odometry benchmark](https://www.cvlibs.net/datasets/kitti/eval_odometry.php) (CC BY-NC-SA 3.0).
 
 ______________________________________________________________________
 
-## :wrench: Installation
+## :package: Installation
 
 ```bash
 git clone https://github.com/sparolab/SOLiD.git
 cd SOLiD
 ```
 
-### Python (Linux / macOS)
-
-```bash
-python3 -m venv .venv && source .venv/bin/activate   # or: uv venv && source .venv/bin/activate
-pip install .                                        # builds the C++ core (needs CMake + Eigen)
-pip install rosbags matplotlib                       # only for slam/mac
-```
-
-On macOS, install the build tools first: `xcode-select --install` and `brew install cmake eigen`.
+Everything is built on one C++ library, [`cpp/`](cpp): the ROS 1 node, the ROS 2 node and the macOS tool all run the same code.
 
 ### Docker
 
 ```bash
+xhost +local:docker
+
 # ROS 1
 docker build -f docker/Dockerfile.noetic -t solid:noetic .
+docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data solid:noetic
+
 # ROS 2
 docker build -f docker/Dockerfile.humble -t solid:humble .
-
-xhost +local:docker
 docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
   -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data solid:humble
 ```
@@ -87,10 +78,11 @@ docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
   <summary><strong>ROS 1 (Noetic)</strong></summary>
 
 ```bash
-sudo apt install libeigen3-dev libyaml-cpp-dev
-mkdir -p ~/catkin_ws/src && ln -s "$PWD" ~/catkin_ws/src/SOLiD
+sudo add-apt-repository ppa:borglab/gtsam-release-4.0
+sudo apt install libeigen3-dev libyaml-cpp-dev libgtsam-dev libgtsam-unstable-dev
+
+# clone into ~/catkin_ws/src
 cd ~/catkin_ws && catkin_make -DCMAKE_BUILD_TYPE=Release
-source devel/setup.bash
 ```
 
 </details>
@@ -99,13 +91,23 @@ source devel/setup.bash
   <summary><strong>ROS 2 (Humble)</strong></summary>
 
 ```bash
-sudo apt install libeigen3-dev libyaml-cpp-dev
-mkdir -p ~/ros2_ws/src && ln -s "$PWD" ~/ros2_ws/src/SOLiD
-cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
-source install/setup.bash
+sudo apt install libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
+
+# clone into ~/ros2_ws/src
+cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/ros2 src/SOLiD/multi_session_slam/ros2 \
+  --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
-`--base-paths` keeps colcon from also picking up the ROS 1 package.
+</details>
+
+<details open>
+  <summary><strong>macOS (no ROS)</strong></summary>
+
+```bash
+xcode-select --install && brew install cmake eigen
+python3 -m venv .venv && source .venv/bin/activate     # or: uv venv && source .venv/bin/activate
+pip install . rosbags matplotlib
+```
 
 </details>
 
@@ -113,57 +115,28 @@ ______________________________________________________________________
 
 ## :rocket: Run
 
-### ROS 1 / ROS 2
-
-The node takes a point cloud and the odometry that goes with it, from any LiDAR or radar odometry (FAST-LIO2, LIO-SAM, KISS-ICP, GaRLILEO, ...):
-
 ```bash
 # ROS 1
-roslaunch solid_ros solid.launch config:=kitti cloud_topic:=/cloud odom_topic:=/odom save_dir:=$HOME/solid_results
+roslaunch solid_ros solid.launch config:=kitti save_dir:=$HOME/solid_results
 rosbag play --clock kitti00.bag
 
 # ROS 2
-ros2 launch solid_ros solid.launch.py config:=kitti cloud_topic:=/cloud odom_topic:=/odom save_dir:=$HOME/solid_results
+ros2 launch solid_ros solid.launch.py config:=kitti save_dir:=$HOME/solid_results
 ros2 bag play kitti00_ros2 --clock
+
+# macOS
+cd slam/mac && python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out $HOME/solid_results
 ```
 
-| Topic | Type | |
-| --- | --- | --- |
-| `cloud_topic` (in) | `sensor_msgs/PointCloud2` | in the sensor frame, or set `input.cloud_in_world: true` |
-| `odom_topic` (in) | `nav_msgs/Odometry` | pose of the cloud's frame |
-| `/solid/loop_candidates` (out) | `solid_ros/LoopCandidate` | query and match keyframe: ids, stamps, poses, score, yaw |
-| `/solid/markers` (out) | `visualization_msgs/MarkerArray` | keyframe path and loop lines for RViz |
-
-With `save_dir` set, the node saves the run as an [LT-mapper](https://github.com/gisbi-kim/lt-mapper) session on exit (`Scans/`, `SCDs/`, `SOLiDs/`, `singlesession_posegraph.g2o`, plus `keyframes.txt` and `loops.csv`), ready for [multi-session SLAM](multi_session_slam).
-
-### macOS (no ROS)
-
-[`slam/mac/solid_loops.py`](slam/mac/solid_loops.py) reads a ROS 1 bag, a ROS 2 bag or a KITTI sequence directly, with no ROS installed:
+Each run is saved as a session, and sessions from different days can be aligned into one map:
 
 ```bash
-cd slam/mac
-# ROS 1 .bag or ROS 2 bag folder
-python solid_loops.py --bag kitti00.bag --cloud /cloud --odom /odom --config ../config/kitti.yaml --out results
-# KITTI sequence (velodyne/, poses.txt, calib.txt); --gt-radius checks loops against the poses
-python solid_loops.py --kitti /data/kitti/sequences/00 --config ../config/kitti.yaml --out results --gt-radius 5
+# ROS 1 / ROS 2
+roslaunch solid_multi_session align.launch sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned
+ros2 launch solid_multi_session align.launch.py sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned
 ```
 
-It writes the same LT-mapper session as the ROS nodes, plus `loops.png` (trajectory with loop markers), to `--out`. `--range START:END --rebase` cuts one sequence into separate sessions. To try the ROS nodes on KITTI, [`kitti_to_bag.py`](slam/mac/kitti_to_bag.py) turns a sequence into a ROS 1 or ROS 2 bag.
-
-### Python / C++ API
-
-```python
-import numpy as np
-import solid
-
-cfg = solid.load_config("lidar_velodyne")      # or lidar_ouster, radar_4d, or a YAML path
-ext, db = solid.Extractor(cfg), solid.Database(cfg)
-db.add(0, ext.extract(points_0))                # points: (N, 3) float32
-for c in db.query(ext.extract(points_1)):       # sorted by cosine similarity
-    print(c.id, c.score, c.yaw_rad)
-```
-
-The C++ API is the same (`solid::Extractor`, `solid::Database`); see [`cpp/README.md`](cpp/README.md).
+See the guides for all arguments, outputs and odometry integrations (FAST-LIO, KISS-ICP, GeoRIO, GaRLILEO): [Loop detection](slam/GUIDE.md) · [Multi-session SLAM](multi_session_slam/GUIDE.md).
 
 ______________________________________________________________________
 
@@ -172,33 +145,18 @@ ______________________________________________________________________
 Open [Claude Code](https://claude.com/claude-code) or [Codex](https://openai.com/codex/) in an empty folder and paste:
 
 ```text
-Clone https://github.com/sparolab/SOLiD, read its AGENTS.md, and follow it to build SOLiD and run the loop detector on KITTI 00 on this machine. Ask me what you need along the way.
+Clone https://github.com/sparolab/SOLiD, read its AGENTS.md, and follow it to build SOLiD and run it on KITTI 00 on this machine. Ask me what you need along the way.
 ```
 
-The agent follows [`AGENTS.md`](AGENTS.md): it picks ROS 1, ROS 2 or the Mac tool, builds it, runs it on KITTI 00, and checks the loops.
+The agent follows [`AGENTS.md`](AGENTS.md): it builds SOLiD for ROS 1, ROS 2 or macOS, gets the data, runs it, and checks the loops.
 
 ______________________________________________________________________
 
 ## :gear: Configuration
 
-One YAML file per sensor in [`slam/config`](slam/config), read by all three front-ends:
-
-| Section | Keys | |
-| --- | --- | --- |
-| `solid` | `fov_up`, `fov_down`, `num_height`, `num_range`, `num_angle`, `min_range`, `max_range`, `voxel_size`, `use_weight` | descriptor; set the FOV to your sensor |
-| `keyframe` | `dist`, `angle_deg` | new keyframe after this much motion |
-| `loop` | `exclude_recent`, `min_score`, `max_candidates` | skip the latest keyframes; minimum R-SOLiD cosine similarity |
-| `input` | `cloud_in_world`, `weight_field` | cloud frame; per-point weight field (radar power) |
-
-On KITTI 00, `min_score: 0.99` gives a precision of 1.00 and a recall of 0.80 (a revisit counts within 5 m). Retune `min_score` for a new sensor: run the Mac tool with `--gt-radius` on a sequence with ground truth.
+All parameters are read at runtime from one YAML file per sensor (`kitti`, `ouster64`, `vlp16`, `radar_4d`). See the configuration guides: [Loop detection](slam/config/GUIDE.md) · [Multi-session SLAM](multi_session_slam/GUIDE.md#configuration).
 
 ______________________________________________________________________
-
-## :link: SOLiD in other projects
-
-- **Multi-robot SLAM**: [SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM), [Distributed-SOLiD-SLAM](https://github.com/sparolab/Distributed-SOLiD-SLAM)
-- **Single-robot SLAM**: [SOLiD-A-LOAM](https://github.com/sparolab/SOLiD-A-LOAM), [SOLiD-PyICP-SLAM](https://github.com/sparolab/SOLiD-PyICP-SLAM)
-- **Benchmarks**: [HeLiPR Place Recognition Toolbox](https://github.com/minwoo0611/HeLiPR-Place-Recognition), [awesome-lidar-place-recognition](https://github.com/hogyun2/awesome-lidar-place-recognition)
 
 ## Citation
 
@@ -221,12 +179,16 @@ If you use SOLiD in your research, please cite our [paper](https://ieeexplore.ie
 
 ## Contributing
 
-We would love to see SOLiD grow with the community. Open an issue or a Pull Request, and your face joins the list below!
+We envision SOLiD as a community-driven project and love to see it grow through contributions from the community. We would love to see your face in the list below, just open a Pull Request!
 
 <a href="https://github.com/sparolab/SOLiD/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=sparolab/SOLiD" />
 </a>
 
-## Contact
+## Acknowledgements
 
-[Hogyun Kim](https://scholar.google.com/citations?user=t5UEbooAAAAJ&hl=ko), [Spatial AI and Robotics Lab (SPARO)](https://sites.google.com/view/sparo), Inha University. For questions, open an issue or comment on [alphaXiv](https://www.alphaxiv.org/abs/2408.07330).
+SOLiD runs with [FAST-LIO](https://github.com/hku-mars/FAST_LIO), [KISS-ICP](https://github.com/PRBonn/kiss-icp), [GeoRIO](https://github.com/wooseongY/GeoRIO) and [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO), and builds on [nanoflann](https://github.com/jlblancoc/nanoflann), [GTSAM](https://github.com/borglab/gtsam) and [PCL](https://github.com/PointCloudLibrary/pcl). We thank the authors for open-sourcing their work.
+
+## Special Thanks
+
+We sincerely thank **[Giseop Kim](https://gisbi-kim.github.io/)** for open-sourcing [LT-mapper](https://github.com/gisbi-kim/lt-mapper), whose session format and multi-session design our multi-session SLAM follows.
