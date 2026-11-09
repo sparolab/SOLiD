@@ -1,0 +1,15 @@
+FROM osrf/ros:noetic-desktop-full
+
+ENV DEBIAN_FRONTEND=noninteractive
+# cmake >= 3.16 is already in Ubuntu 20.04; Eigen and yaml-cpp come with ROS.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libeigen3-dev libyaml-cpp-dev python3-catkin-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /catkin_ws/src/SOLiD
+# Only the ROS 1 package: hide the ROS 2 one from catkin (ros2/ has CATKIN_IGNORE).
+WORKDIR /catkin_ws
+RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release
+
+RUN echo "source /catkin_ws/devel/setup.bash" >> /root/.bashrc
+CMD ["bash"]

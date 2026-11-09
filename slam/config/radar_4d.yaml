@@ -1,0 +1,29 @@
+# 4D imaging radar (sparse points, weighted by return power / RCS).
+# Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
+# Remove dynamic points (e.g. with Doppler) before the cloud reaches SOLiD.
+
+solid:
+  fov_up: 15.0
+  fov_down: -15.0
+  num_angle: 60
+  num_range: 40
+  num_height: 8         # coarse elevation bins: radar is sparse
+  min_range: 0.5
+  max_range: 60.0
+  voxel_size: 0.0       # no downsampling, keeps weights aligned with points
+  use_weight: true      # weight bins by `input.weight_field`
+  knn: 30
+  min_similarity: 0.0
+
+keyframe:
+  dist: 1.0
+  angle_deg: 10.0
+
+loop:
+  exclude_recent: 50
+  min_score: 0.99       # tune per sensor
+  max_candidates: 1
+
+input:
+  cloud_in_world: false
+  weight_field: "power" # e.g. power / intensity / rcs; check your driver's fields

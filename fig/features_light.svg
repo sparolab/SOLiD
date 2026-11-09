@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="230" viewBox="0 0 960 230">
+<style>.t{font:700 19px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#1f2328}.d{font:400 13.5px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#59636e}</style>
+<rect x="6" y="6" width="228" height="218" rx="14" fill="#f6f8fa" stroke="#d0d7de"/>
+<rect x="246" y="6" width="228" height="218" rx="14" fill="#f6f8fa" stroke="#d0d7de"/>
+<rect x="486" y="6" width="228" height="218" rx="14" fill="#f6f8fa" stroke="#d0d7de"/>
+<rect x="726" y="6" width="228" height="218" rx="14" fill="#f6f8fa" stroke="#d0d7de"/>
+<path d="M50 75 L200 13" stroke="#59636e" stroke-dasharray="3 5" opacity="0.6"/>
+<path d="M50 75 L200 137" stroke="#59636e" stroke-dasharray="3 5" opacity="0.6"/>
+<path d="M79.1 67.7 L117.9 58.1 A70 70 0 0 1 119.7 68.9 L79.9 72.4 A30 30 0 0 0 79.1 67.7 Z" fill="#3F51B5" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M79.9 72.4 L119.7 68.9 A70 70 0 0 1 119.8 79.9 L79.9 77.1 A30 30 0 0 0 79.9 72.4 Z" fill="#3F51B5" opacity="0.9" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M79.9 77.1 L119.8 79.9 A70 70 0 0 1 118.2 90.7 L79.2 81.7 A30 30 0 0 0 79.9 77.1 Z" fill="#3F51B5" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M117.9 58.1 L156.7 48.4 A110 110 0 0 1 159.6 65.4 L119.7 68.9 A70 70 0 0 0 117.9 58.1 Z" fill="#D81B60" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M119.7 68.9 L159.6 65.4 A110 110 0 0 1 159.7 82.7 L119.8 79.9 A70 70 0 0 0 119.7 68.9 Z" fill="#D81B60" opacity="0.9" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M119.8 79.9 L159.7 82.7 A110 110 0 0 1 157.2 99.7 L118.2 90.7 A70 70 0 0 0 119.8 79.9 Z" fill="#D81B60" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M156.7 48.4 L195.5 38.7 A150 150 0 0 1 199.4 61.9 L159.6 65.4 A110 110 0 0 0 156.7 48.4 Z" fill="#00897B" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M159.6 65.4 L199.4 61.9 A150 150 0 0 1 199.6 85.5 L159.7 82.7 A110 110 0 0 0 159.6 65.4 Z" fill="#00897B" opacity="0.9" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M159.7 82.7 L199.6 85.5 A150 150 0 0 1 196.2 108.7 L157.2 99.7 A110 110 0 0 0 159.7 82.7 Z" fill="#00897B" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<rect x="38" y="66" width="16" height="18" rx="3" fill="#1f2328"/>
+<text class="t" x="24" y="160">FOV-aware</text>
+<text class="d" x="24" y="184">Bins live inside the sensor's</text>
+<text class="d" x="24" y="202">real vertical field of view</text>
+<rect x="264" y="92.0" width="9" height="28.0" rx="2" fill="#3F51B5"/>
+<rect x="276" y="72.0" width="9" height="48.0" rx="2" fill="#3F51B5"/>
+<rect x="288" y="48.0" width="9" height="72.0" rx="2" fill="#3F51B5"/>
+<rect x="300" y="60.0" width="9" height="60.0" rx="2" fill="#3F51B5"/>
+<rect x="312" y="76.0" width="9" height="44.0" rx="2" fill="#3F51B5"/>
+<rect x="324" y="88.0" width="9" height="32.0" rx="2" fill="#3F51B5"/>
+<rect x="336" y="96.0" width="9" height="24.0" rx="2" fill="#3F51B5"/>
+<rect x="348" y="104.0" width="9" height="16.0" rx="2" fill="#3F51B5"/>
+<text class="d" x="264" y="138" style="font-weight:700;fill:#3F51B5">R · range</text>
+<path d="M412.0 54.0 L412.0 42.0 A34 34 0 0 1 428.0 46.0 L422.3 56.6 A22 22 0 0 0 412.0 54.0 Z" fill="#D81B60" opacity="0.9" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M423.0 56.9 L429.0 46.6 A34 34 0 0 1 440.8 58.0 L430.7 64.3 A22 22 0 0 0 423.0 56.9 Z" fill="#D81B60" opacity="0.35" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M431.1 65.0 L441.4 59.0 A34 34 0 0 1 446.0 74.8 L434.0 75.2 A22 22 0 0 0 431.1 65.0 Z" fill="#D81B60" opacity="0.6" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M434.0 76.0 L446.0 76.0 A34 34 0 0 1 442.0 92.0 L431.4 86.3 A22 22 0 0 0 434.0 76.0 Z" fill="#D81B60" opacity="0.3" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M431.1 87.0 L441.4 93.0 A34 34 0 0 1 430.0 104.8 L423.7 94.7 A22 22 0 0 0 431.1 87.0 Z" fill="#D81B60" opacity="0.75" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M423.0 95.1 L429.0 105.4 A34 34 0 0 1 413.2 110.0 L412.8 98.0 A22 22 0 0 0 423.0 95.1 Z" fill="#D81B60" opacity="0.4" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M412.0 98.0 L412.0 110.0 A34 34 0 0 1 396.0 106.0 L401.7 95.4 A22 22 0 0 0 412.0 98.0 Z" fill="#D81B60" opacity="0.5" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M401.0 95.1 L395.0 105.4 A34 34 0 0 1 383.2 94.0 L393.3 87.7 A22 22 0 0 0 401.0 95.1 Z" fill="#D81B60" opacity="0.3" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M392.9 87.0 L382.6 93.0 A34 34 0 0 1 378.0 77.2 L390.0 76.8 A22 22 0 0 0 392.9 87.0 Z" fill="#D81B60" opacity="0.85" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M390.0 76.0 L378.0 76.0 A34 34 0 0 1 382.0 60.0 L392.6 65.7 A22 22 0 0 0 390.0 76.0 Z" fill="#D81B60" opacity="0.45" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M392.9 65.0 L382.6 59.0 A34 34 0 0 1 394.0 47.2 L400.3 57.3 A22 22 0 0 0 392.9 65.0 Z" fill="#D81B60" opacity="0.35" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M401.0 56.9 L395.0 46.6 A34 34 0 0 1 410.8 42.0 L411.2 54.0 A22 22 0 0 0 401.0 56.9 Z" fill="#D81B60" opacity="0.6" stroke="#f6f8fa" stroke-width="1.5"/>
+<path d="M435.0 36.2 A46 46 0 0 1 455.2 91.7" fill="none" stroke="#00897B" stroke-width="3" stroke-linecap="round"/>
+<path d="M448.2 85.7 L457.7 97.2 L461.2 82.7" fill="none" stroke="#00897B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<text class="d" x="382" y="138" style="font-weight:700;fill:#D81B60">A · yaw</text>
+<text class="t" x="264" y="160">Two signatures</text>
+<text class="d" x="264" y="184">Range finds the place,</text>
+<text class="d" x="264" y="202">azimuth recovers the yaw</text>
+<line x1="564" y1="22" x2="564" y2="32" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="564" y1="118" x2="564" y2="128" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="540" y1="46" x2="550" y2="46" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="636" y1="46" x2="646" y2="46" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="579" y1="22" x2="579" y2="32" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="579" y1="118" x2="579" y2="128" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="540" y1="61" x2="550" y2="61" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="636" y1="61" x2="646" y2="61" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="594" y1="22" x2="594" y2="32" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="594" y1="118" x2="594" y2="128" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="540" y1="76" x2="550" y2="76" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="636" y1="76" x2="646" y2="76" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="609" y1="22" x2="609" y2="32" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="609" y1="118" x2="609" y2="128" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="540" y1="91" x2="550" y2="91" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="636" y1="91" x2="646" y2="91" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="624" y1="22" x2="624" y2="32" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="624" y1="118" x2="624" y2="128" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="540" y1="106" x2="550" y2="106" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<line x1="636" y1="106" x2="646" y2="106" stroke="#59636e" stroke-width="3" stroke-linecap="round"/>
+<rect x="550" y="32" width="86" height="86" rx="12" fill="#00897B"/>
+<rect x="564" y="46" width="58" height="58" rx="7" fill="none" stroke="#f6f8fa" stroke-width="2" opacity="0.7"/>
+<text x="593.0" y="84.0" text-anchor="middle" style="font:800 24px Inter,Helvetica,Arial,sans-serif;fill:#f6f8fa">ms</text>
+<text class="t" x="504" y="160">Lightweight</text>
+<text class="d" x="504" y="184">Milliseconds per keyframe</text>
+<text class="d" x="504" y="202">on a CPU, no GPU, no training</text>
+<rect x="764" y="86" width="28" height="26" rx="5" fill="#3F51B5"/>
+<line x1="778" y1="99" x2="730.5" y2="65.7" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="740.7" y2="54.6" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="753.5" y2="46.4" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="767.9" y2="41.9" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="783.1" y2="41.2" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="797.8" y2="44.5" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="811.3" y2="51.5" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<line x1="778" y1="99" x2="822.4" y2="61.7" stroke="#3F51B5" stroke-width="2" stroke-dasharray="2 4" opacity="0.8"/>
+<rect x="864" y="92" width="32" height="20" rx="4" fill="#D81B60"/>
+<path d="M865.9 85.1 A22 22 0 0 1 894.1 85.1" fill="none" stroke="#D81B60" stroke-width="3" stroke-linecap="round" opacity="1.0"/>
+<path d="M855.6 72.9 A38 38 0 0 1 904.4 72.9" fill="none" stroke="#D81B60" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+<path d="M845.3 60.6 A54 54 0 0 1 914.7 60.6" fill="none" stroke="#D81B60" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+<text class="d" x="758" y="138" style="font-weight:700;fill:#3F51B5">LiDAR</text>
+<text class="d" x="850" y="138" style="font-weight:700;fill:#D81B60">4D radar</text>
+<text class="t" x="744" y="160">Any range sensor</text>
+<text class="d" x="744" y="184">LiDAR occupancy, or radar</text>
+<text class="d" x="744" y="202">points weighted by power</text>
+</svg>

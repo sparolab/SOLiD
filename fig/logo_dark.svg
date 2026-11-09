@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="150" viewBox="0 0 760 150">
+  <path d="M2.3 103.2 A96 96 0 0 1 187.7 103.2" fill="none" stroke="#9198a1" stroke-width="1.6" stroke-dasharray="3 6" opacity="0.6"/>
+  <path d="M83.0 107.2 L71.0 86.4 A48 48 0 0 1 86.7 80.7 L90.8 104.4 A24 24 0 0 0 83.0 107.2 Z" fill="#7986CB" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <path d="M90.8 104.4 L86.7 80.7 A48 48 0 0 1 103.3 80.7 L99.2 104.4 A24 24 0 0 0 90.8 104.4 Z" fill="#7986CB" opacity="0.95" stroke="#0d1117" stroke-width="2"/>
+  <path d="M99.2 104.4 L103.3 80.7 A48 48 0 0 1 119.0 86.4 L107.0 107.2 A24 24 0 0 0 99.2 104.4 Z" fill="#7986CB" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <path d="M71.0 86.4 L59.0 65.6 A72 72 0 0 1 82.5 57.1 L86.7 80.7 A48 48 0 0 0 71.0 86.4 Z" fill="#F06292" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <path d="M86.7 80.7 L82.5 57.1 A72 72 0 0 1 107.5 57.1 L103.3 80.7 A48 48 0 0 0 86.7 80.7 Z" fill="#F06292" opacity="0.95" stroke="#0d1117" stroke-width="2"/>
+  <path d="M103.3 80.7 L107.5 57.1 A72 72 0 0 1 131.0 65.6 L119.0 86.4 A48 48 0 0 0 103.3 80.7 Z" fill="#F06292" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <path d="M59.0 65.6 L47.0 44.9 A96 96 0 0 1 78.3 33.5 L82.5 57.1 A72 72 0 0 0 59.0 65.6 Z" fill="#4DB6AC" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <path d="M82.5 57.1 L78.3 33.5 A96 96 0 0 1 111.7 33.5 L107.5 57.1 A72 72 0 0 0 82.5 57.1 Z" fill="#4DB6AC" opacity="0.95" stroke="#0d1117" stroke-width="2"/>
+  <path d="M107.5 57.1 L111.7 33.5 A96 96 0 0 1 143.0 44.9 L131.0 65.6 A72 72 0 0 0 107.5 57.1 Z" fill="#4DB6AC" opacity="0.5" stroke="#0d1117" stroke-width="2"/>
+  <circle cx="95" cy="128" r="8" fill="#e6edf3"/>
+  <text x="205" y="88" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-1" fill="#e6edf3"><tspan fill="#7986CB">S</tspan><tspan fill="#F06292">O</tspan><tspan fill="#4DB6AC">Li</tspan>D</text>
+  <text x="208" y="126" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="21" font-weight="500" fill="#9198a1"><tspan fill="#7986CB" font-weight="800">S</tspan>patially <tspan fill="#F06292" font-weight="800">O</tspan>rganized and <tspan fill="#4DB6AC" font-weight="800">Li</tspan>ghtweight Global <tspan fill="#e6edf3" font-weight="800">D</tspan>escriptor</text>
+</svg>

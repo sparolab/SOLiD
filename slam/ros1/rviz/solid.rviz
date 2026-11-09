@@ -1,0 +1,35 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 10
+      Plane Cell Count: 50
+      Color: 160; 160; 164
+    - Class: rviz/MarkerArray
+      Name: SOLiD loops
+      Enabled: true
+      Marker Topic: /solid/markers
+      Queue Size: 100
+  Global Options:
+    Background Color: 30; 30; 30
+    Fixed Frame: odom
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/MoveCamera
+  Views:
+    Current:
+      Class: rviz/TopDownOrtho
+      Name: Current View
+      Scale: 2
+      X: 0
+      Y: 0
+  Value: true
+Window Geometry:
+  Height: 900
+  Width: 1200

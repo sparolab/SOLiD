@@ -1,0 +1,15 @@
+FROM ros:humble-perception
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libeigen3-dev libyaml-cpp-dev ros-humble-rviz2 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . /ros2_ws/src/SOLiD
+WORKDIR /ros2_ws
+# --base-paths keeps colcon from also picking up the ROS 1 package.
+RUN . /opt/ros/humble/setup.sh && \
+    colcon build --base-paths src/SOLiD/slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+
+RUN echo "source /ros2_ws/install/setup.bash" >> /root/.bashrc
+CMD ["bash"]

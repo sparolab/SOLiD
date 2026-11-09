@@ -1,0 +1,4 @@
+{
+  "name": "solid_ros",
+  "type": "ros.ament_cmake"
+}

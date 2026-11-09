@@ -1,0 +1,39 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 10
+      Plane Cell Count: 50
+      Color: 160; 160; 164
+    - Class: rviz_default_plugins/MarkerArray
+      Name: SOLiD loops
+      Enabled: true
+      Topic:
+        Value: /solid/markers
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+        Depth: 1
+  Global Options:
+    Background Color: 30; 30; 30
+    Fixed Frame: odom
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Name: Current View
+      Scale: 2
+      X: 0
+      Y: 0
+  Value: true
+Window Geometry:
+  Height: 900
+  Width: 1200

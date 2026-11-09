@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>solid_ros</name>
+  <version>0.1.0</version>
+  <description>SOLiD loop candidate detector for LiDAR and 4D radar odometry (ROS 2).</description>
+  <maintainer email="hg.kim@inha.edu">Hogyun Kim</maintainer>
+  <license>GPL-3.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>message_filters</depend>
+  <depend>eigen</depend>
+  <depend>yaml-cpp</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
