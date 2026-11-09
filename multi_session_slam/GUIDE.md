@@ -31,8 +31,8 @@ Outputs in `save_dir`: `<session>_aligned.txt` (KITTI) and `<session>_aligned_tu
 
 ```bash
 cd slam/mac
-python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
-python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
 roslaunch solid_multi_session align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
 ```
 

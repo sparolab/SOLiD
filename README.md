@@ -14,7 +14,7 @@
   <a href="https://sparolab.github.io/research/solid/"><img src="https://img.shields.io/badge/Project-Page-blue" /></a>
   <a href="https://ieeexplore.ieee.org/abstract/document/10629042"><img src="https://img.shields.io/badge/Paper-IEEE%20RA--L-yellow" /></a>
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
-  <a href="https://www.dropbox.com/scl/fo/qgsj4cj03vziul4e0xnbr/AD1KSBVdeMMk6rUpFaxD8kE?rlkey=7ecyaowj1lhtjfatnei4pd3ye&dl=0"><img src="https://img.shields.io/badge/Dataset-Dropbox-0061FF?logo=dropbox&logoColor=white" /></a>
+  <a href="https://www.cvlibs.net/datasets/kitti/eval_odometry.php"><img src="https://img.shields.io/badge/Dataset-KITTI-0061FF" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
   <br />
   <img src="fig/solid_demo.gif" alt="SOLiD on KITTI 00: the map builds up, the trajectory rises with time, and each loop SOLiD finds links the current pose down to the place it recognized" width="95%" />
@@ -43,7 +43,13 @@ A robot recognizes where it has been before, even when its sensor sees only a na
 
 ## :floppy_disk: Datasets
 
-KITTI 00 as ROS bags (`/cloud`, `/odom` with ground-truth poses), ready for every example below, is on **[Dropbox](https://www.dropbox.com/scl/fo/qgsj4cj03vziul4e0xnbr/AD1KSBVdeMMk6rUpFaxD8kE?rlkey=7ecyaowj1lhtjfatnei4pd3ye&dl=0)**: `kitti00.bag` (ROS 1, 730 MB), `kitti00_ros2/` (ROS 2, 735 MB) and `kitti00_loop.bag` (a 112 MB cut that returns to the start). They are derived from the [KITTI odometry benchmark](https://www.cvlibs.net/datasets/kitti/eval_odometry.php) (CC BY-NC-SA 3.0).
+The examples use **[KITTI odometry](https://www.cvlibs.net/datasets/kitti/eval_odometry.php)** sequence 00 (velodyne scans, poses and calibration). The macOS tool reads the sequence folder directly; for ROS, turn it into a bag with `/cloud` and `/odom` (ground-truth poses):
+
+```bash
+cd slam/mac
+python kitti_to_bag.py /path/to/kitti/sequences/00 kitti00.bag --voxel 0.4        # ROS 1
+python kitti_to_bag.py /path/to/kitti/sequences/00 kitti00_ros2 --voxel 0.4       # ROS 2
+```
 
 ______________________________________________________________________
 
@@ -124,8 +130,8 @@ rosbag play --clock kitti00.bag
 ros2 launch solid_ros solid.launch.py config:=kitti save_dir:=$HOME/solid_results
 ros2 bag play kitti00_ros2 --clock
 
-# macOS
-cd slam/mac && python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out $HOME/solid_results
+# macOS (a bag works too: --bag kitti00.bag)
+cd slam/mac && python solid_loops.py --kitti /path/to/kitti/sequences/00 --config ../config/kitti.yaml --out $HOME/solid_results
 ```
 
 Each run is saved as a session, and sessions from different days can be aligned into one map:

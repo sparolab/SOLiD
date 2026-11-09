@@ -8,7 +8,7 @@ You are setting up and running SOLiD (a LiDAR / 4D radar place recognition descr
 
 1. Platform: **ROS 1 (Noetic)**, **ROS 2 (Humble)** or **macOS / Linux without ROS**.
 2. For ROS: **Docker** (recommended; any Linux host with Docker) or **from source** (Noetic on Ubuntu 20.04, Humble on Ubuntu 22.04).
-3. Whether they already have the KITTI 00 bags (and where), or whether you should download them (step 4, about 0.8 GB for one format).
+3. Where their KITTI odometry sequence 00 is (the `sequences/00` folder with `velodyne/`, `poses.txt`, `calib.txt`). If they do not have it, tell them to download it from the KITTI website (registration required): the velodyne scans (80 GB for all sequences), poses and calibration.
 4. Where to save results (default `~/solid_results`).
 
 ## 1. Check the machine
@@ -67,9 +67,15 @@ python -c "import solid; print(solid.backend)"            # must print: cpp
 python python/tests/test_binding.py                       # must end with: PASSED
 ```
 
-## 4. Get the data
+## 4. Prepare the data
 
-The [Dropbox folder](https://www.dropbox.com/scl/fo/qgsj4cj03vziul4e0xnbr/AD1KSBVdeMMk6rUpFaxD8kE?rlkey=7ecyaowj1lhtjfatnei4pd3ye&dl=0) has `kitti00.bag` (ROS 1), `kitti00_ros2/` (ROS 2) and `kitti00_loop.bag` (a small cut). Each holds `/cloud` (sensor frame) and `/odom` (ground-truth poses). Download the one that fits the platform; the folder downloads as one zip when the link ends in `dl=1`. The macOS tool reads both formats.
+The macOS tool reads the KITTI folder directly. For ROS, convert it to a bag (`/cloud` in the sensor frame, `/odom` with the ground-truth poses). The converter only needs `rosbags`, so run it with the Python from step 3 (or `pip install rosbags numpy` on the host):
+
+```bash
+cd slam/mac
+python kitti_to_bag.py /path/to/sequences/00 ~/kitti00.bag --voxel 0.4     # ROS 1, about 0.75 GB
+python kitti_to_bag.py /path/to/sequences/00 ~/kitti00_ros2 --voxel 0.4    # ROS 2
+```
 
 ## 5. Run
 
@@ -84,7 +90,7 @@ ros2 bag play kitti00_ros2 --clock
 
 # macOS / Linux without ROS
 cd slam/mac
-python solid_loops.py --bag /path/to/kitti00.bag --config ../config/kitti.yaml --out $HOME/solid_results --gt-radius 5
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out $HOME/solid_results --gt-radius 5
 ```
 
 When the bag has finished, stop the launch with **Ctrl-C**: the node saves on exit.
@@ -92,7 +98,7 @@ When the bag has finished, stop the launch with **Ctrl-C**: the node saves on ex
 ## 6. Check the result
 
 - `$HOME/solid_results/loops.csv` and `keyframes.txt` must exist (plus `Scans/`, `SCDs/`, `SOLiDs/`, `singlesession_posegraph.g2o`).
-- Expected on full KITTI 00: about **2712 keyframes and 415–416 loop candidates**, all within 5 m of each other (the macOS tool prints `precision 1.000` with `--gt-radius 5`). Small differences (±2) between ROS 1 and ROS 2 come from message timing.
+- Expected on full KITTI 00: about **2712 keyframes and about 416 loop candidates**, all within 5 m of each other (the macOS tool prints `precision 1.000` with `--gt-radius 5`). Small differences between the KITTI folder, the ROS 1 and the ROS 2 runs come from the bag's voxel filter and message timing.
 - macOS: open `loops.png`. The red loop markers sit on the stretches KITTI 00 drives twice.
 - Report the numbers and the plot to the user.
 
@@ -102,8 +108,8 @@ Cut KITTI 00 into two sessions and align them (ROS 1 or ROS 2 build):
 
 ```bash
 cd slam/mac
-python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
-python solid_loops.py --bag kitti00.bag --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
 roslaunch solid_multi_session align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
 ```
 
