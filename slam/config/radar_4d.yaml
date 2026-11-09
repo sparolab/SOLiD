@@ -13,7 +13,7 @@ solid:
   min_range: 0.5
   max_range: 60.0
   voxel_size: 0.0       # no downsampling, keeps weights aligned with points
-  use_weight: true      # weight bins by `input.weight_field`
+  use_weight: false     # true: weight bins by `input.weight_field` (needs a real power/RCS field)
   knn: 30
   min_similarity: 0.0
 
@@ -22,14 +22,14 @@ keyframe:
   angle_deg: 10.0
 
 submap:
-  scans: 20             # merge the last 20 scans (KITTI cut to 400 points/scan: recall 0 -> 0.68 at precision 1.0)
+  scans: 20             # merge the last 20 scans (SNAIL-Radar + GeoRIO: recall 0.02 -> 0.67 at precision 1.0)
   max_dist: 15.0        # m, but only those within 15 m of travel
 
 loop:
   exclude_recent: 50
-  min_score: 0.99       # tune per sensor
+  min_score: 0.97       # SNAIL-Radar ARS548 + GeoRIO: precision 1.00, recall 0.67
   max_candidates: 1
 
 input:
   cloud_in_world: false
-  weight_field: "power" # e.g. power / intensity / rcs; check your driver's fields
+  weight_field: ""      # e.g. "power" / "rcs" when use_weight is true; check your driver's fields

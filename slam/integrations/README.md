@@ -8,6 +8,7 @@ Launch files that run an odometry together with the SOLiD loop candidate node. T
 | `ros1/kiss_solid.launch` | [KISS-ICP](https://github.com/PRBonn/kiss-icp) `v0.3.0` | Noetic |
 | `ros2/fastlio_solid.launch.py` | [sparo-fast-lio](https://github.com/sparolab/sparo-fast-lio) | Humble |
 | `ros2/kiss_solid.launch.py` | [KISS-ICP](https://github.com/PRBonn/kiss-icp) `v1.3` | Humble |
+| `config/georio.yaml` | [GeoRIO](https://github.com/wooseongY/GeoRIO) (4D radar): `ros2 launch solid_ros solid.launch.py config:=<this file> cloud_topic:=/current_scan odom_topic:=/odometry_georio` | Humble |
 
 ```bash
 roslaunch slam/integrations/ros1/fastlio_solid.launch save_dir:=$HOME/solid_results    # then: rosbag play --clock <bag>

@@ -38,6 +38,7 @@ Copy the closest one for a new sensor and pass its path as `config`.
 | Data | Odometry | `min_score` | Loops | Precision |
 | --- | --- | --- | --- | --- |
 | KITTI 00, HDL-64 | ground truth | 0.99 | 416 | 1.00 (recall 0.80) |
+| SNAIL-Radar 20240113/data1, ARS548 4D radar, submap 20 | GeoRIO | 0.97 | 143 | 1.00 (recall 0.67) |
 | Kimera-Multi sparkal1, VLP-16 | FAST-LIO (ROS 1) | 0.98 | 25 | 0.76 (0.83 at 0.985) |
 | Kimera-Multi sparkal1, VLP-16 | KISS-ICP (ROS 1) | 0.98 | 21 | 0.76 (0.89 at 0.985) |
 | Kimera-Multi sparkal1, VLP-16 | FAST-LIO (ROS 2) | 0.98 | 24 | 0.67 (0.82 at 0.985) |
@@ -56,7 +57,16 @@ A single 4D radar scan (a few hundred points) is too sparse for place recognitio
 | 10 | 0.99 | 202 | 1.00 | 0.39 |
 | 20 | 0.99 | 352 | 1.00 | 0.68 |
 
-Recall here is the share of keyframes that revisit a place (within 5 m, more than 50 keyframes earlier) and get a correct candidate. `radar_4d.yaml` uses 20 scans within 15 m.
+On real 4D radar, [SNAIL-Radar](https://snail-radar.github.io/) `20240113/data1` (Continental ARS548, about 1,100 points per scan) with [GeoRIO](https://github.com/wooseongY/GeoRIO) odometry, against ground truth:
+
+| `submap.scans` | `min_score` 0.95: precision / recall | `min_score` 0.97: precision / recall |
+| --- | --- | --- |
+| 1 | 0.95 / 0.25 | 1.00 / 0.02 |
+| 10 | 0.90 / 0.87 | 1.00 / 0.60 |
+| 20 | 0.91 / 0.90 | 1.00 / 0.67 |
+| 40 | 0.93 / 0.88 | 1.00 / 0.70 |
+
+Recall here is the share of keyframes that revisit a place (within 5 m, more than 50 keyframes earlier) and get a correct candidate. `radar_4d.yaml` uses 20 scans within 15 m and `min_score` 0.97.
 
 ## Pitfalls
 

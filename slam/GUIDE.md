@@ -36,8 +36,8 @@ The node only proposes loops. Verify them (e.g. ICP) and add them to your pose g
 | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) (ROS 1) | LiDAR | the raw LiDAR topic | `/Odometry` | FAST-LIO's body frame is the IMU frame: do not use `/cloud_registered_body` if the IMU is not aligned with the LiDAR |
 | [FAST-LIO](https://github.com/sparolab/sparo-fast-lio) (ROS 2) | LiDAR | `/<robot>/cloud_registered_lidar` | `/<robot>/odometry` | set `visualization_frame: lidar` |
 | [KISS-ICP](https://github.com/PRBonn/kiss-icp) | LiDAR | `/kiss/frame` | `/kiss/odometry` | ROS 1: `v0.3.0`, the last release with ROS 1 |
-| [GeoRIO](https://github.com/wooseongY/GeoRIO) (ROS 2) | 4D radar | see [`integrations`](integrations) | | `config:=radar_4d` |
-| [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) (ROS 2) | 4D radar | see [`integrations`](integrations) | | `config:=radar_4d` |
+| [GeoRIO](https://github.com/wooseongY/GeoRIO) (ROS 2) | 4D radar | `/current_scan` | `/odometry_georio` | `config:=slam/integrations/config/georio.yaml` (the scan is in the odometry frame) |
+| [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) (ROS 2) | 4D radar | | | `config:=radar_4d` (not tested yet) |
 
 Ready-made launch files for these are in [`integrations/`](integrations).
 
