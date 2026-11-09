@@ -17,13 +17,13 @@ roslaunch solid_ros align.launch sessions:="$HOME/day1 $HOME/day2" save_dir:=$HO
 # ROS 2
 ros2 launch solid_ros align.launch.py sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned
 # macOS / Linux without ROS
-solid_align_sessions config/multi_session/lidar.yaml $HOME/aligned $HOME/day1 $HOME/day2
+solid_align_sessions slam/config/multi_session/lidar.yaml $HOME/aligned $HOME/day1 $HOME/day2
 ```
 
 | Argument | | |
 | --- | --- | --- |
 | `sessions` | required | session folders separated by spaces; the first is the central session |
-| `config` | `config/multi_session/lidar.yaml` | see below (`radar_4d.yaml` for 4D radar sessions) |
+| `config` | `slam/config/multi_session/lidar.yaml` | see below (`radar_4d.yaml` for 4D radar sessions) |
 | `save_dir` | empty | where to save the result |
 | `rviz` | `true` | show the aligned map, trajectories and loops |
 
@@ -32,9 +32,9 @@ Outputs in `save_dir`: `<session>_aligned.txt` (KITTI) and `<session>_aligned_tu
 ### Example: KITTI 00 as two sessions
 
 ```bash
-cd mac
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
+cd slam/common/mac
+python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
 roslaunch solid_ros align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
 ```
 
@@ -52,12 +52,12 @@ SNAIL-Radar `starlake tower` (`20240113/1`, `20231208/1`, `20231213/1`; Continen
 
 ```bash
 roslaunch solid_ros align.launch sessions:="st_20240113 st_20231208 st_20231213" \
-  config:=$PWD/config/multi_session/radar_4d.yaml save_dir:=aligned
+  config:=$PWD/slam/config/multi_session/radar_4d.yaml save_dir:=aligned
 ```
 
 ## Configuration
 
-[`config/multi_session/lidar.yaml`](../config/multi_session/lidar.yaml) and [`radar_4d.yaml`](../config/multi_session/radar_4d.yaml):
+[`slam/config/multi_session/lidar.yaml`](../slam/config/multi_session/lidar.yaml) and [`radar_4d.yaml`](../slam/config/multi_session/radar_4d.yaml):
 
 | Section | Key | |
 | --- | --- | --- |

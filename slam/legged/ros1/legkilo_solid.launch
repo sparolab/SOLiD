@@ -1,0 +1,19 @@
+<launch>
+  <!-- Leg-KILO (kinematic-inertial-LiDAR odometry, legged robots) + SOLiD loop closing, ROS 1.
+       Tested on the Leg-KILO dataset (Unitree Go1, VLP-16). Leg-KILO's /Odometry is the IMU pose
+       and /cloud_registered the deskewed scan in the odometry frame (cloud_in_world: true). -->
+  <arg name="legkilo_config" default="$(find legkilo)/config/legkilo_go1_velodyne.yaml" />
+  <arg name="solid_config" default="$(dirname)/../config/legkilo.yaml" />
+  <arg name="save_dir" default="" />
+
+  <node pkg="legkilo" type="legkilo_node" name="legkilo_node" output="log"
+        args="--config_file=$(arg legkilo_config)" />
+
+  <include file="$(find solid_ros)/launch/solid.launch">
+    <arg name="config" value="$(arg solid_config)" />
+    <arg name="cloud_topic" value="/cloud_registered" />
+    <arg name="odom_topic" value="/Odometry" />
+    <arg name="save_dir" value="$(arg save_dir)" />
+    <arg name="rviz" value="false" />
+  </include>
+</launch>

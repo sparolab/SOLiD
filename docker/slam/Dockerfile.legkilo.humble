@@ -1,0 +1,19 @@
+# Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, ROS 1 and ROS 2) + SOLiD.
+# Leg-KILO always opens its own viewer: without a display, run it under `xvfb-run -a`.
+#   docker build -t solid-legkilo:humble -f docker/slam/Dockerfile.legkilo.humble .
+FROM solid:humble
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+      libeigen3-dev libpcl-dev libgoogle-glog-dev libgflags-dev libyaml-cpp-dev \
+      libboost-filesystem-dev libboost-system-dev libtbb-dev liblz4-dev libglm-dev libglfw3-dev libsuitesparse-dev \
+      xvfb libgl1-mesa-dri \
+    && rm -rf /var/lib/apt/lists/*
+# Leg-KILO needs Ceres >= 2.1 (ceres/manifold.h); Ubuntu 22.04 ships 2.0.
+RUN git clone --branch 2.2.0 --depth 1 https://github.com/ceres-solver/ceres-solver.git /tmp/ceres && \
+    cmake -S /tmp/ceres -B /tmp/ceres/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF \
+      -DBUILD_BENCHMARKS=OFF -DUSE_CUDA=OFF && \
+    cmake --build /tmp/ceres/build -j4 && cmake --install /tmp/ceres/build && rm -rf /tmp/ceres
+RUN git clone --depth 1 https://github.com/ouguangjun/Leg-KILO.git /ros2_ws/src/Leg-KILO
+WORKDIR /ros2_ws
+RUN . /opt/ros/humble/setup.sh && colcon build --base-paths src/Leg-KILO --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+CMD ["bash"]

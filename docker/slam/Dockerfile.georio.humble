@@ -1,0 +1,13 @@
+# GeoRIO (4D radar-inertial odometry, ROS 2) + SOLiD.
+#   docker build -t solid-georio:humble -f docker/slam/Dockerfile.georio.humble .
+FROM solid:humble
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends git libomp-dev libpcl-dev \
+      ros-humble-pcl-conversions ros-humble-pcl-ros ros-humble-rosbag2-storage-mcap \
+    && rm -rf /var/lib/apt/lists/*
+RUN git clone --recurse-submodules https://github.com/wooseongY/GeoRIO.git /ros2_ws/src/GeoRIO
+WORKDIR /ros2_ws
+RUN . /opt/ros/humble/setup.sh && \
+    colcon build --base-paths src/GeoRIO --packages-up-to geo_rio --parallel-workers 2 \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release
+CMD ["bash"]

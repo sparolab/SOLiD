@@ -34,8 +34,8 @@
 <text class="t" x="264" y="178">4D radar</text>
 <text class="d" x="264" y="200">GeoRIO</text>
 <text class="n" x="264" y="222" fill="#D81B60">SNAIL: ATE 0.47 → 0.19 m</text>
-<text class="t" x="504" y="178">Legged · radar</text>
-<text class="d" x="504" y="200">GaRLILEO</text>
+<text class="t" x="504" y="178">Legged</text>
+<text class="d" x="504" y="200">GaRLILEO (radar), Leg-KILO</text>
 <text class="n" x="504" y="222" fill="#00897B">Spot: ATE 0.42 → 0.30 m</text>
 <text class="t" x="744" y="178">Humanoid · Livox</text>
 <text class="d" x="744" y="200">FAST-LIO (Mid-360)</text>

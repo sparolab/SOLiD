@@ -16,7 +16,7 @@ RUN . /opt/ros/humble/setup.sh \
 # 2. ROS 2 packages find it with find_package(solid). --base-paths skips the ROS 1 packages.
 WORKDIR /ros2_ws
 RUN . /opt/ros/humble/setup.sh && \
-    colcon build --base-paths src/SOLiD/ros2 \
+    colcon build --base-paths src/SOLiD/slam/common/ros2 \
       --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 RUN echo "source /ros2_ws/install/setup.bash" >> /root/.bashrc

@@ -24,7 +24,7 @@ git clone https://github.com/sparolab/SOLiD.git
 cd SOLiD
 ```
 
-Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop detection, loop closing, multi-session); `ros1/` and `ros2/` are the ROS packages (`solid_ros`: `solid_node`, `align_node`); `mac/` holds the ROS-free tools; `config/` holds one YAML per sensor; `integrations/` has launch files per odometry and platform.
+Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop detection, loop closing, multi-session). `slam/common/ros1` and `slam/common/ros2` are the ROS packages (`solid_ros`: `solid_node`, `align_node`), `slam/common/mac` the ROS-free tools, `slam/config` one YAML per sensor, and `slam/{lidar,radar,legged,humanoid}` the odometry integrations (each with `ros1/`, `ros2/`, `mac/`, `config/`).
 
 ## 3. Build
 
@@ -51,7 +51,7 @@ source devel/setup.bash
 sudo apt install -y libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
 mkdir -p ~/ros2_ws/src && ln -s "$PWD" ~/ros2_ws/src/SOLiD
 cd ~/ros2_ws && source /opt/ros/humble/setup.bash
-colcon build --base-paths src/SOLiD/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+colcon build --base-paths src/SOLiD/slam/common/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
@@ -77,7 +77,7 @@ python python/tests/test_binding.py                       # must end with: PASSE
 The macOS tool reads the KITTI folder directly. For ROS, convert it to a bag (`/cloud` in the sensor frame, `/odom` with the ground-truth poses). The converter only needs `rosbags`, so run it with the Python from step 3 (or `pip install rosbags numpy` on the host):
 
 ```bash
-cd mac
+cd slam/common/mac
 python kitti_to_bag.py /path/to/sequences/00 ~/kitti00.bag --voxel 0.4     # ROS 1, about 0.75 GB
 python kitti_to_bag.py /path/to/sequences/00 ~/kitti00_ros2 --voxel 0.4    # ROS 2
 ```
@@ -94,8 +94,8 @@ ros2 launch solid_ros solid.launch.py config:=kitti save_dir:=$HOME/solid_result
 ros2 bag play kitti00_ros2 --clock
 
 # macOS / Linux without ROS
-cd mac
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out $HOME/solid_results --gt-radius 5 --close-loops
+cd slam/common/mac
+python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out $HOME/solid_results --gt-radius 5 --close-loops
 ```
 
 When the bag has finished, stop the launch with **Ctrl-C**: the node saves on exit.
@@ -112,17 +112,17 @@ When the bag has finished, stop the launch with **Ctrl-C**: the node saves on ex
 Cut KITTI 00 into two sessions and align them (ROS 1 or ROS 2 build):
 
 ```bash
-cd mac
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
+cd slam/common/mac
+python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
+python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
 roslaunch solid_ros align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
-# or without ROS: $SOLID_TOOLS/solid_align_sessions ../config/multi_session/lidar.yaml aligned sessions/00a sessions/00b
+# or without ROS: $SOLID_TOOLS/solid_align_sessions ../../config/multi_session/lidar.yaml aligned sessions/00a sessions/00b
 ```
 
 The node prints, for 00b, the SOLiD candidates, the verified loops and `ALIGNED`. See [docs/MULTI_SESSION.md](docs/MULTI_SESSION.md).
 
 ## Troubleshooting
 
-- **No loops at all**: the cloud is probably not in a z-up sensor frame (e.g. an IMU or camera optical frame), or the FOV in the config does not match the sensor. See [config/GUIDE.md](config/GUIDE.md#pitfalls).
+- **No loops at all**: the cloud is probably not in a z-up sensor frame (e.g. an IMU or camera optical frame), or the FOV in the config does not match the sensor. See [config/GUIDE.md](slam/config/GUIDE.md#pitfalls).
 - **ROS 2 node saves nothing**: it saves on shutdown; stop it with Ctrl-C (SIGINT), not `kill -9`.
 - **macOS build fails**: check `brew list cmake eigen` and that the Python is not the Apple system Python 3.9.

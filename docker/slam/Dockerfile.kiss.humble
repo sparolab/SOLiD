@@ -1,0 +1,13 @@
+# KISS-ICP (ROS 2) + SOLiD.
+#   docker build -t solid-kiss:humble -f docker/slam/Dockerfile.kiss.humble .
+FROM solid:humble
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends git libtbb-dev python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+# KISS-ICP fetches Sophus, which needs CMake >= 3.24 (Humble ships 3.22).
+RUN pip3 install --no-cache-dir "cmake==3.28.*"
+RUN git clone --branch v1.3.0 --depth 1 https://github.com/PRBonn/kiss-icp.git /ros2_ws/src/kiss-icp
+WORKDIR /ros2_ws
+RUN . /opt/ros/humble/setup.sh && \
+    colcon build --base-paths src/kiss-icp/ros --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+CMD ["bash"]
