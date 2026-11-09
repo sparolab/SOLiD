@@ -60,12 +60,14 @@ source install/setup.bash
 ### macOS / Linux without ROS
 
 ```bash
-xcode-select --install; brew install cmake eigen pcl gtsam yaml-cpp   # macOS only
+xcode-select --install; brew install cmake eigen pcl yaml-cpp      # macOS only
 python3 -m venv .venv && source .venv/bin/activate
 pip install . rosbags matplotlib
-# the C++ back-end tools (loop closing, multi-session): solid_close_loops, solid_align_sessions
+# Linux: sudo apt install libpcl-dev libgtsam-dev (or ros-<distro>-gtsam) libyaml-cpp-dev
+# macOS: GTSAM is not in Homebrew; build 4.3.0 from source as in README.md (Installation > macOS)
+#        and add -DGTSAM_DIR=$HOME/gtsam-install/lib/cmake/GTSAM below
 cmake -S cpp -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON && cmake --build build -j
-export SOLID_TOOLS=$PWD/build
+export SOLID_TOOLS=$PWD/build    # solid_close_loops, solid_align_sessions
 python -c "import solid; print(solid.backend)"            # must print: cpp
 python python/tests/test_binding.py                       # must end with: PASSED
 ```

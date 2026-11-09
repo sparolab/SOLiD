@@ -3,10 +3,14 @@
 //   solid_align_sessions <config.yaml> <out_dir> <central_session> <session> [session ...]
 #include <iostream>
 
+#include <pcl/console/print.h>
+
 #include "solid/backend/aligner.hpp"
 #include "solid/backend/params_yaml.hpp"
 
 int main(int argc, char** argv) {
+  // Without OpenMP (e.g. Apple clang) PCL warns on every GICP call; keep errors only.
+  pcl::console::setVerbosityLevel(pcl::console::L_ERROR);
   if (argc < 5) {
     std::cerr << "usage: solid_align_sessions <config.yaml> <out_dir> <central> <session> [...]\n";
     return 1;

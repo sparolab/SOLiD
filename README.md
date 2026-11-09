@@ -119,11 +119,20 @@ cd ~/ros2_ws && colcon build --base-paths src/SOLiD/ros2 --cmake-args -DCMAKE_BU
   <summary><strong>macOS (no ROS)</strong></summary>
 
 ```bash
-xcode-select --install && brew install cmake eigen pcl gtsam yaml-cpp
+xcode-select --install && brew install cmake eigen pcl yaml-cpp
 python3 -m venv .venv && source .venv/bin/activate     # or: uv venv && source .venv/bin/activate
 pip install . rosbags matplotlib                         # front-end (Python binding)
-cmake -S cpp -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON && cmake --build build -j
-export SOLID_TOOLS=$PWD/build                            # loop closing + multi-session tools
+
+# GTSAM is not in Homebrew: build it once (tested: 4.3.0 with Homebrew Eigen 5)
+git clone --branch 4.3.0 --depth 1 https://github.com/borglab/gtsam.git ~/gtsam-src
+cmake -S ~/gtsam-src -B ~/gtsam-build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$HOME/gtsam-install \
+  -DGTSAM_USE_SYSTEM_EIGEN=ON -DGTSAM_WITH_TBB=OFF -DGTSAM_BUILD_TESTS=OFF -DGTSAM_BUILD_EXAMPLES_ALWAYS=OFF \
+  -DGTSAM_BUILD_UNSTABLE=OFF -DGTSAM_BUILD_PYTHON=OFF -DGTSAM_ENABLE_BOOST_SERIALIZATION=OFF -DGTSAM_USE_BOOST_FEATURES=OFF
+cmake --build ~/gtsam-build -j && cmake --install ~/gtsam-build
+
+# back-end tools: loop closing (solid_close_loops) and multi-session (solid_align_sessions)
+cmake -S cpp -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON -DGTSAM_DIR=$HOME/gtsam-install/lib/cmake/GTSAM
+cmake --build build -j && export SOLID_TOOLS=$PWD/build
 ```
 
 </details>

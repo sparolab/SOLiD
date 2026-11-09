@@ -11,6 +11,8 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+
+#include <pcl/console/print.h>
 #include <map>
 #include <sstream>
 
@@ -19,6 +21,8 @@
 #include "solid/backend/session.hpp"
 
 int main(int argc, char** argv) {
+  // Without OpenMP (e.g. Apple clang) PCL warns on every GICP call; keep errors only.
+  pcl::console::setVerbosityLevel(pcl::console::L_ERROR);
   if (argc < 3) {
     std::cerr << "usage: solid_close_loops <session_dir> <config.yaml> [out_dir]\n";
     return 1;
