@@ -22,7 +22,7 @@ Each platform folder has the same layout: `ros1/` and `ros2/` (launch files that
 | `radar` | [GeoRIO](https://github.com/wooseongY/GeoRIO) | – | `georio_solid.launch.py` | `georio.sh` | SNAIL-Radar (ARS548) | ATE 0.47 → 0.19 m |
 | `legged` | [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) | – | `garlileo_solid.launch.py` | `garlileo.sh` | GaRLILEO (Spot, TI IWR1843) | ATE 0.42 → 0.30 m |
 | `legged` | [Leg-KILO](https://github.com/ouguangjun/Leg-KILO) | `legkilo_solid.launch` | `legkilo_solid.launch.py` | `legkilo.sh` | Leg-KILO `corridor` (Go1, VLP-16) | ATE 0.22 m (already accurate) |
-| `humanoid` | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) on a Livox Mid-360 | `fastlio_mid360_solid.launch` | `fastlio_mid360_solid.launch.py` | `fast_lio_mid360.sh` | KILVO (Unitree G1) | 19 loops kept, 9 rejected |
+| `humanoid` | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) on a Livox Mid-360 | `fastlio_mid360_solid.launch` | `fastlio_mid360_solid.launch.py` | `fast_lio_mid360.sh` | [KILVO](https://github.com/JixinGao/KILVO) (Unitree G1) | 19 loops kept, 9 rejected |
 
 GeoRIO and GaRLILEO are ROS 2 only.
 
@@ -43,5 +43,5 @@ Notes from testing:
 - **Frames.** SOLiD needs the cloud in a z-up sensor frame and the pose of that sensor. FAST-LIO's `/Odometry` is the IMU pose: give SOLiD the raw LiDAR scan and `input.extrinsic` (LiDAR in IMU), as in `lidar/config/kimera_sparkal1.yaml`. GeoRIO's `/current_scan` and Leg-KILO's `/cloud_registered` are in the odometry frame: `input.cloud_in_world: true`.
 - **GaRLILEO** stamps `/Odometry` relative to its first IMU message; `legged/ros2/garlileo_odom_relay.py` (started by the launch file) republishes it with absolute stamps. Its TI radar gives ~30 points per scan, so `garlileo.yaml` merges 50 scans per keyframe. Its image is built on GaRLILEO's own Dockerfile (`docker build -t garlileo-deps https://github.com/ChiyunNoh/GaRLILEO.git#main:docker`) and skips `align_node`.
 - **Leg-KILO** always opens its own viewer; without a display run it under `xvfb-run -a` (installed in its image).
-- **KILVO** bags carry `livox_ros_driver2` messages; ROS 1 FAST-LIO reads `livox_ros_driver`, so convert them with `humanoid/ros1/livox2_to_livox1.py`. Its Mid-360 is mounted upside down; SOLiD's elevation bins are symmetric, so only the FOV matters.
+- **[KILVO](https://github.com/JixinGao/KILVO)** bags carry `livox_ros_driver2` messages; ROS 1 FAST-LIO reads `livox_ros_driver`, so convert them with `humanoid/ros1/livox2_to_livox1.py`. Its Mid-360 is mounted upside down; SOLiD's elevation bins are symmetric, so only the FOV matters.
 - **KISS-ICP (ROS 1)** keeps a queue of one scan: play bags at 1x. Kimera-Multi VLP-16 clouds have no per-point time: run it with `deskew:=false`.

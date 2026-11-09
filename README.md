@@ -53,7 +53,7 @@ It runs on top of the odometry you already have, on cars, legged robots and huma
 
 ## :floppy_disk: Datasets
 
-The examples use **[KITTI odometry](https://www.cvlibs.net/datasets/kitti/eval_odometry.php)** sequence 00 (velodyne scans, poses and calibration). The integrations were tested on [Kimera-Multi](https://github.com/MIT-SPARK/Kimera-Multi-Data), [SNAIL-Radar](https://snail-radar.github.io/), the [GaRLILEO dataset](https://garlileo.github.io/GaRLILEO/), the [Leg-KILO dataset](https://github.com/ouguangjun/legkilo-dataset) and KILVO. The macOS tool reads the sequence folder directly; for ROS, turn it into a bag with `/cloud` and `/odom` (ground-truth poses):
+The examples use **[KITTI odometry](https://www.cvlibs.net/datasets/kitti/eval_odometry.php)** sequence 00 (velodyne scans, poses and calibration). The integrations were tested on [Kimera-Multi](https://github.com/MIT-SPARK/Kimera-Multi-Data), [SNAIL-Radar](https://snail-radar.github.io/), the [GaRLILEO dataset](https://garlileo.github.io/GaRLILEO/), the [Leg-KILO dataset](https://github.com/ouguangjun/legkilo-dataset) and [KILVO](https://github.com/JixinGao/KILVO). The macOS tool reads the sequence folder directly; for ROS, turn it into a bag with `/cloud` and `/odom` (ground-truth poses):
 
 ```bash
 cd slam/common/mac
@@ -215,7 +215,7 @@ We envision SOLiD as a community-driven project and love to see it grow through 
 
 ## Acknowledgements
 
-SOLiD runs with [FAST-LIO](https://github.com/hku-mars/FAST_LIO), [KISS-ICP](https://github.com/PRBonn/kiss-icp), [GeoRIO](https://github.com/wooseongY/GeoRIO), [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) and [Leg-KILO](https://github.com/ouguangjun/Leg-KILO), was tested on [Kimera-Multi](https://github.com/MIT-SPARK/Kimera-Multi-Data), [SNAIL-Radar](https://snail-radar.github.io/), the [GaRLILEO dataset](https://garlileo.github.io/GaRLILEO/), the [Leg-KILO dataset](https://github.com/ouguangjun/legkilo-dataset) and KILVO, and builds on [nanoflann](https://github.com/jlblancoc/nanoflann), [GTSAM](https://github.com/borglab/gtsam) and [PCL](https://github.com/PointCloudLibrary/pcl). We thank the authors for open-sourcing their work.
+SOLiD runs with [FAST-LIO](https://github.com/hku-mars/FAST_LIO), [KISS-ICP](https://github.com/PRBonn/kiss-icp), [GeoRIO](https://github.com/wooseongY/GeoRIO), [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) and [Leg-KILO](https://github.com/ouguangjun/Leg-KILO), was tested on [Kimera-Multi](https://github.com/MIT-SPARK/Kimera-Multi-Data), [SNAIL-Radar](https://snail-radar.github.io/), the [GaRLILEO dataset](https://garlileo.github.io/GaRLILEO/), the [Leg-KILO dataset](https://github.com/ouguangjun/legkilo-dataset) and [KILVO](https://github.com/JixinGao/KILVO), and builds on [nanoflann](https://github.com/jlblancoc/nanoflann), [GTSAM](https://github.com/borglab/gtsam) and [PCL](https://github.com/PointCloudLibrary/pcl). We thank the authors for open-sourcing their work.
 
 ## Special Thanks
 

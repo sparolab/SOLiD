@@ -52,7 +52,7 @@ ATE after a best rigid fit to the ground truth, so only the drift counts:
 | GaRLILEO BridgeLoop (TI IWR1843, Spot) | GaRLILEO | 0.42 m (max 0.80) | **0.30 m** (max 0.75) |
 | Leg-KILO corridor (VLP-16, Go1) | Leg-KILO | 0.22 m (max 0.42) | 0.23 m (max 0.42): little drift to remove, 3 loops kept |
 
-On the KILVO humanoid (Unitree G1, Livox Mid-360, FAST-LIO; no ground truth), the GICP check kept all 19 candidates that FAST-LIO also puts within 3 m and rejected all 9 that it does not.
+On the [KILVO](https://github.com/JixinGao/KILVO) humanoid (Unitree G1, Livox Mid-360, FAST-LIO; no ground truth), the GICP check kept all 19 candidates that FAST-LIO also puts within 3 m and rejected all 9 that it does not.
 
 ## Tuning `min_score`
 
@@ -62,7 +62,7 @@ On the KILVO humanoid (Unitree G1, Livox Mid-360, FAST-LIO; no ground truth), th
 | --- | --- | --- | --- | --- |
 | KITTI 00, HDL-64 | ground truth | 0.99 | 416 | 1.00 (recall 0.80) |
 | GaRLILEO BridgeLoop, TI IWR1843, submap 50 | GaRLILEO | 0.98 | 116 | 0.95 (recall 0.70) |
-| KILVO outdoor_h01, Livox Mid-360, submap 10 | FAST-LIO | 0.98 | 28 | 0.68 before GICP, 1.00 after |
+| [KILVO](https://github.com/JixinGao/KILVO) outdoor_h01, Livox Mid-360, submap 10 | FAST-LIO | 0.98 | 28 | 0.68 before GICP, 1.00 after |
 | SNAIL-Radar 20240113/data1, ARS548 4D radar, submap 20 | GeoRIO | 0.97 | 143 | 1.00 (recall 0.67) |
 | Kimera-Multi sparkal1, VLP-16 | FAST-LIO (ROS 1) | 0.98 | 25 | 0.76 (0.83 at 0.985) |
 | Kimera-Multi sparkal1, VLP-16 | KISS-ICP (ROS 1) | 0.98 | 21 | 0.76 (0.89 at 0.985) |
