@@ -1,0 +1,12 @@
+# LT-SLAM parameters (https://github.com/gisbi-kim/lt-mapper). run_ltslam.sh mounts
+# this file over ltslam/config/params.yaml inside the container.
+ltslam:
+  sessions_dir: "/data/sessions/"   # one sub-folder per session (written by SOLiD's save_dir)
+  central_sess_name: "SESSION_A"     # the reference session
+  query_sess_name: "SESSION_B"       # the session aligned to it
+  save_directory: "/data/aligned/"
+  is_display_debug_msgs: false
+  loopFitnessScoreThreshold: 0.7     # ICP fitness to accept an inter-session loop
+  kNumSCLoopsUpperBound: 1000
+  kNumRSLoopsUpperBound: 0
+  numberOfCores: 8

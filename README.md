@@ -16,7 +16,7 @@
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
   <br />
-  <img src="fig/kitti05_solid.gif" alt="SOLiD loop closures on KITTI 05" width="95%" />
+  <img src="fig/solid_demo.gif" alt="SOLiD on KITTI 00: the map builds up, the trajectory rises with time, and each loop SOLiD finds links the current pose down to the place it recognized" width="95%" />
   <p>
     <strong>[IEEE RA-L 2024] Narrowing your FOV with SOLiD: Spatially Organized and Lightweight<br />
     Global Descriptor for FOV-constrained LiDAR Place Recognition</strong>
@@ -25,12 +25,14 @@
 
 ______________________________________________________________________
 
-SOLiD is a lightweight global descriptor for LiDAR and 4D radar place recognition, built for sensors whose field of view is narrow or partly blocked (solid-state LiDAR, sensor fusion rigs, robot bodies in the way):
+SOLiD is a lightweight global descriptor for LiDAR and 4D radar place recognition, built for sensors whose field of view is narrow or partly blocked (solid-state LiDAR, sensor fusion rigs, robot bodies in the way).
 
-- :dart: **FOV-aware**: points are binned by range, elevation and azimuth inside the sensor's real vertical FOV, so a narrow FOV still gives a dense descriptor.
-- :compass: **Two signatures**: R-SOLiD (range) is rotation invariant and drives retrieval; A-SOLiD (azimuth) recovers the relative yaw of a loop.
-- :zap: **Lightweight**: a few milliseconds per keyframe on a CPU, with no GPU or learned weights.
-- :satellite: **Any sensor**: LiDAR uses point occupancy, and 4D radar can weight each point by its return power.
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="fig/features_dark.svg" />
+    <img src="fig/features_light.svg" alt="FOV-aware bins, two signatures (range for retrieval, azimuth for yaw), milliseconds on a CPU, LiDAR or 4D radar" width="100%" />
+  </picture>
+</p>
 
 <p align="center"><img src="fig/method.png" alt="SOLiD descriptor" width="85%" /></p>
 
@@ -43,6 +45,7 @@ SOLiD is a lightweight global descriptor for LiDAR and 4D radar place recognitio
 | [`slam/ros1/`](slam/ros1) | Loop candidate node for ROS 1 Noetic | Ubuntu 20.04 |
 | [`slam/ros2/`](slam/ros2) | Loop candidate node for ROS 2 Humble | Ubuntu 22.04 |
 | [`slam/mac/`](slam/mac) | Offline loop detection on rosbags or KITTI, no ROS needed | macOS, Linux |
+| [`multi_session_slam/`](multi_session_slam) | Align sessions saved by the tools above ([LT-mapper](https://github.com/gisbi-kim/lt-mapper)) | ROS 1 (Docker) |
 
 The ROS nodes and the Mac tool share one keyframe and loop logic ([`slam/common`](slam/common)) and one set of sensor configs ([`slam/config`](slam/config): `kitti`, `ouster64`, `radar_4d`). They find loop candidates only. Registration and pose-graph optimization stay in your SLAM.
 
@@ -131,7 +134,7 @@ ros2 bag play kitti00_ros2 --clock
 | `/solid/loop_candidates` (out) | `solid_ros/LoopCandidate` | query and match keyframe: ids, stamps, poses, score, yaw |
 | `/solid/markers` (out) | `visualization_msgs/MarkerArray` | keyframe path and loop lines for RViz |
 
-With `save_dir` set, the node writes `keyframes.txt` (TUM) and `loops.csv` on exit.
+With `save_dir` set, the node saves the run as an [LT-mapper](https://github.com/gisbi-kim/lt-mapper) session on exit (`Scans/`, `SCDs/`, `SOLiDs/`, `singlesession_posegraph.g2o`, plus `keyframes.txt` and `loops.csv`), ready for [multi-session SLAM](multi_session_slam).
 
 ### macOS (no ROS)
 
@@ -145,7 +148,7 @@ python solid_loops.py --bag kitti00.bag --cloud /cloud --odom /odom --config ../
 python solid_loops.py --kitti /data/kitti/sequences/00 --config ../config/kitti.yaml --out results --gt-radius 5
 ```
 
-It writes `keyframes.txt`, `loops.csv` and `loops.png` (trajectory with loop lines) to `--out`. To try the ROS nodes on KITTI, [`kitti_to_bag.py`](slam/mac/kitti_to_bag.py) turns a sequence into a ROS 1 or ROS 2 bag.
+It writes the same LT-mapper session as the ROS nodes, plus `loops.png` (trajectory with loop markers), to `--out`. `--range START:END --rebase` cuts one sequence into separate sessions. To try the ROS nodes on KITTI, [`kitti_to_bag.py`](slam/mac/kitti_to_bag.py) turns a sequence into a ROS 1 or ROS 2 bag.
 
 ### Python / C++ API
 

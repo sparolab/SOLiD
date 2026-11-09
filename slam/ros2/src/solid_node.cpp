@@ -20,6 +20,7 @@
 #include "solid_ros/msg/loop_candidate.hpp"
 #include "solid_slam/config_yaml.hpp"
 #include "solid_slam/loop_detector.hpp"
+#include "solid_slam/session_writer.hpp"
 
 namespace {
 
@@ -67,6 +68,7 @@ class SolidNode : public rclcpp::Node {
     if (config.empty()) throw std::runtime_error("parameter 'config' is empty");
     params_ = solid_slam::load_params(config);
     detector_ = std::make_unique<solid_slam::LoopDetector>(params_);
+    session_ = std::make_unique<solid_slam::SessionWriter>(save_dir_);
 
     pub_loops_ = create_publisher<solid_ros::msg::LoopCandidate>("solid/loop_candidates", 100);
     pub_markers_ = create_publisher<visualization_msgs::msg::MarkerArray>(
@@ -87,10 +89,10 @@ class SolidNode : public rclcpp::Node {
                 sub_odom_.getSubscriber()->get_topic_name());
   }
 
-  // Writes keyframes.txt and loops.csv to save_dir (if set). Call after spinning.
+  // Finishes the LT-mapper session in save_dir (if set). Call after spinning.
   void save() const {
     if (save_dir_.empty()) return;
-    if (detector_->save(save_dir_))
+    if (session_->finish(*detector_))
       RCLCPP_INFO(get_logger(), "[solid] saved %zu keyframes, %zu loops to %s",
                   detector_->keyframes().size(), detector_->loops().size(), save_dir_.c_str());
     else
@@ -110,6 +112,7 @@ class SolidNode : public rclcpp::Node {
       if (f.name == "x") { view.offset_x = f.offset; view.datatype_xyz = f.datatype; }
       if (f.name == "y") view.offset_y = f.offset;
       if (f.name == "z") view.offset_z = f.offset;
+      if (f.name == "intensity") { view.offset_i = f.offset; view.datatype_i = f.datatype; }
       if (!params_.weight_field.empty() && f.name == params_.weight_field) {
         view.offset_w = f.offset;
         view.datatype_w = f.datatype;
@@ -125,11 +128,14 @@ class SolidNode : public rclcpp::Node {
                            params_.weight_field.c_str());
 
     const Eigen::Isometry3d world_to_body = pose.inverse();
-    solid_slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_);
+    solid_slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
+                          session_->enabled() ? &intensity_ : nullptr);
 
     const auto t0 = std::chrono::steady_clock::now();
     const auto loops = detector_->add_keyframe(to_sec(cloud->header.stamp), pose, pts_,
                                                w_.empty() ? nullptr : &w_);
+    session_->add_keyframe(detector_->keyframes().back().id, pts_, intensity_,
+                           detector_->last_descriptor());
     const double ms =
         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
 
@@ -184,9 +190,10 @@ class SolidNode : public rclcpp::Node {
 
   solid_slam::Params params_;
   std::unique_ptr<solid_slam::LoopDetector> detector_;
+  std::unique_ptr<solid_slam::SessionWriter> session_;
   std::string save_dir_;
   std::vector<Eigen::Vector3f> pts_;
-  std::vector<float> w_;
+  std::vector<float> w_, intensity_;
 
   rclcpp::Publisher<solid_ros::msg::LoopCandidate>::SharedPtr pub_loops_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pub_markers_;

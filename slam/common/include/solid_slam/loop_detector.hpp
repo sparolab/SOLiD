@@ -67,6 +67,8 @@ struct CloudView {
   std::uint8_t datatype_xyz = 7;  // PointField::FLOAT32
   int offset_w = -1;              // -1: no weight field
   std::uint8_t datatype_w = 7;
+  int offset_i = -1;              // -1: no intensity field (only saved with the session)
+  std::uint8_t datatype_i = 7;
 };
 
 // Reads one value of a PointField datatype (1=INT8 ... 8=FLOAT64).
@@ -84,12 +86,15 @@ inline double read_field(const std::uint8_t* p, std::uint8_t datatype) {
   }
 }
 
-// Converts a cloud to sensor-frame points (+ weights). Drops non-finite points.
-// `world_to_body` is applied when the cloud is in the odometry frame.
+// Converts a cloud to sensor-frame points (+ weights, + intensity if asked).
+// Drops non-finite points. `world_to_body` is applied when the cloud is in the
+// odometry frame.
 inline void to_points(const CloudView& c, const Eigen::Isometry3d* world_to_body,
-                      std::vector<Eigen::Vector3f>& pts, std::vector<float>& w) {
+                      std::vector<Eigen::Vector3f>& pts, std::vector<float>& w,
+                      std::vector<float>* intensity = nullptr) {
   pts.clear();
   w.clear();
+  if (intensity) intensity->clear();
   pts.reserve(c.num_points);
   if (c.offset_w >= 0) w.reserve(c.num_points);
   const Eigen::Isometry3f T =
@@ -102,6 +107,9 @@ inline void to_points(const CloudView& c, const Eigen::Isometry3d* world_to_body
     if (!q.allFinite()) continue;
     pts.push_back(world_to_body ? Eigen::Vector3f(T * q) : q);
     if (c.offset_w >= 0) w.push_back(static_cast<float>(read_field(p + c.offset_w, c.datatype_w)));
+    if (intensity)
+      intensity->push_back(
+          c.offset_i >= 0 ? static_cast<float>(read_field(p + c.offset_i, c.datatype_i)) : 0.0f);
   }
 }
 
@@ -113,6 +121,8 @@ class LoopDetector {
   const Params& params() const { return params_; }
   const std::vector<Keyframe>& keyframes() const { return keyframes_; }
   const std::vector<Loop>& loops() const { return loops_; }
+  // Descriptor of the latest keyframe (before normalization).
+  const solid::Descriptor& last_descriptor() const { return last_; }
 
   // True if `pose` is far enough from the last keyframe to start a new one.
   bool is_keyframe(const Eigen::Isometry3d& pose) const {
@@ -135,6 +145,7 @@ class LoopDetector {
 
     const bool weighted = params_.solid.use_weight && weights && weights->size() == pts.size();
     solid::Descriptor d = extractor_.extract(pts, weighted ? weights : nullptr);
+    last_ = d;
     // L2-normalized R-SOLiD makes the KD-tree distance monotonic in cosine similarity.
     const double n = d.rsolid.norm();
     if (n > 0.0) d.rsolid /= n;
@@ -186,6 +197,7 @@ class LoopDetector {
   std::vector<Keyframe> keyframes_;
   std::vector<Loop> loops_;
   std::deque<std::pair<std::size_t, solid::Descriptor>> pending_;
+  solid::Descriptor last_;
 };
 
 }  // namespace solid_slam
