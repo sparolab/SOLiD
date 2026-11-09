@@ -1,0 +1,27 @@
+# SOLiD multi-session alignment for 4D radar sessions (saved with slam/config/radar_4d.yaml,
+# so every keyframe scan is already a submap of 20 radar scans).
+
+retrieval:
+  min_score: 0.97        # same scale as the radar loop config
+  knn: 30
+  candidate_stride: 1
+  max_verifications: 100
+
+verification:
+  submap_keyframes: 3    # +- keyframes on top of the 20-scan submaps
+  scan_voxel: 0.2        # m, radar submaps are already sparse
+  icp_voxel: 0.5         # m
+  icp_max_dist: 3.0      # m, radar points are noisy
+  icp_max_fitness: 1.0   # m^2
+
+consensus:
+  trans: 3.0
+  rot_deg: 5.0
+  min_inliers: 3
+
+graph:
+  odom_sigma_trans: 0.1
+  odom_sigma_rot_deg: 1.0
+  loop_sigma_trans: 1.0
+  loop_sigma_rot_deg: 5.0
+  iterations: 100

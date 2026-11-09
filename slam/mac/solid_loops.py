@@ -217,6 +217,14 @@ def select_frames(frames: Iterator[Frame], rng: str, rebase: bool) -> Iterator[F
         yield stamp, pose, pts, w, inten
 
 
+def offset_frames(frames: Iterator[Frame], offset: str) -> Iterator[Frame]:
+    x, y, yaw = (float(v) for v in offset.split(","))
+    c, s = np.cos(np.radians(yaw)), np.sin(np.radians(yaw))
+    T = np.array([[c, -s, 0, x], [s, c, 0, y], [0, 0, 1, 0], [0, 0, 0, 1]], dtype=float)
+    for stamp, pose, pts, w, inten in frames:
+        yield stamp, T @ pose, pts, w, inten
+
+
 # --------------------------------------------------------------------------- output
 def plot(det, keyframe_dist: float, path: str, show: bool) -> None:
     import matplotlib
@@ -270,6 +278,9 @@ def main() -> None:
                     help="use only scans START..END-1 (e.g. to cut one sequence into sessions)")
     ap.add_argument("--rebase", action="store_true",
                     help="express poses relative to the first used scan (a session's own frame)")
+    ap.add_argument("--offset", default="", metavar="X,Y,YAW_DEG",
+                    help="move the whole run by this rigid transform (tests multi-session alignment "
+                         "from an unknown start)")
     ap.add_argument("--show", action="store_true", help="open the plot window")
     args = ap.parse_args()
 
@@ -284,6 +295,8 @@ def main() -> None:
 
     if args.range or args.rebase:
         frames = select_frames(frames, args.range, args.rebase)
+    if args.offset:
+        frames = offset_frames(frames, args.offset)
 
     print(f"[solid] backend={solid.backend} config={args.config}")
     t0, n_scans, t_desc = time.time(), 0, 0.0
