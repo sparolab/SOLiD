@@ -19,6 +19,10 @@ keyframe:
   dist: 1.0
   angle_deg: 10.0
 
+submap:
+  scans: 1              # scans merged into each keyframe's descriptor (1 = single scan)
+  max_dist: 0.0         # m, only merge scans within this travel distance (0 = no limit)
+
 loop:
   exclude_recent: 50
   min_score: 0.98       # precision ~0.67-0.76 (4 runs); 0.985 -> 0.70-0.89 with ~half the loops

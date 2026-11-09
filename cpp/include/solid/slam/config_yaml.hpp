@@ -45,6 +45,10 @@ inline Params load_params(const std::string& path) {
   get(k, "dist", p.keyframe_dist);
   get(k, "angle_deg", p.keyframe_angle_deg);
 
+  const YAML::Node m = root["submap"];
+  get(m, "scans", p.submap_scans);
+  get(m, "max_dist", p.submap_max_dist);
+
   const YAML::Node l = root["loop"];
   get(l, "exclude_recent", p.exclude_recent);
   get(l, "min_score", p.min_score);

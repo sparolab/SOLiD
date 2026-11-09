@@ -126,6 +126,8 @@ PYBIND11_MODULE(_core, m) {
       .def_readwrite("solid", &Params::solid)
       .def_readwrite("keyframe_dist", &Params::keyframe_dist)
       .def_readwrite("keyframe_angle_deg", &Params::keyframe_angle_deg)
+      .def_readwrite("submap_scans", &Params::submap_scans)
+      .def_readwrite("submap_max_dist", &Params::submap_max_dist)
       .def_readwrite("exclude_recent", &Params::exclude_recent)
       .def_readwrite("min_score", &Params::min_score)
       .def_readwrite("max_candidates", &Params::max_candidates)
@@ -150,6 +152,30 @@ PYBIND11_MODULE(_core, m) {
              return d.add_keyframe(stamp, toIso(pose), p, w.empty() ? nullptr : &w);
            },
            py::arg("stamp"), py::arg("pose"), py::arg("points"), py::arg("weights") = py::none())
+      .def("process",
+           [](LoopDetector& d, double stamp, const Eigen::Matrix4d& pose,
+              const py::array_t<float, py::array::c_style | py::array::forcecast>& pts,
+              py::object weights, py::object intensity) {
+             const auto p = npToPoints(pts);
+             const auto w = optFloats(weights, p.size(), "weights");
+             const auto in = optFloats(intensity, p.size(), "intensity");
+             std::vector<solid::slam::Loop> loops;
+             const bool kf = d.process(stamp, toIso(pose), p, w.empty() ? nullptr : &w,
+                                       in.empty() ? nullptr : &in, loops);
+             return py::make_tuple(kf, loops);
+           },
+           py::arg("stamp"), py::arg("pose"), py::arg("points"), py::arg("weights") = py::none(),
+           py::arg("intensity") = py::none(),
+           "Feed one scan; returns (is_keyframe, loops). Merges the last submap_scans scans.")
+      .def("last_points", [](const LoopDetector& d) {
+        const auto& p = d.last_points();
+        py::array_t<float> a({static_cast<py::ssize_t>(p.size()), static_cast<py::ssize_t>(3)});
+        auto m = a.mutable_unchecked<2>();
+        for (std::size_t i = 0; i < p.size(); ++i)
+          for (int k = 0; k < 3; ++k) m(static_cast<py::ssize_t>(i), k) = p[i](k);
+        return a;
+      })
+      .def("last_intensity", &LoopDetector::last_intensity)
       .def_property_readonly("num_keyframes", [](const LoopDetector& d) { return d.keyframes().size(); })
       .def_property_readonly("stamps", [](const LoopDetector& d) {
         std::vector<double> s;

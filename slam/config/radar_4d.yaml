@@ -1,6 +1,8 @@
 # 4D imaging radar (sparse points, weighted by return power / RCS).
 # Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
 # Remove dynamic points (e.g. with Doppler) before the cloud reaches SOLiD.
+# A single radar scan is too sparse to recognize a place, so each keyframe's
+# descriptor is built from a submap of the last scans.
 
 solid:
   fov_up: 15.0
@@ -18,6 +20,10 @@ solid:
 keyframe:
   dist: 1.0
   angle_deg: 10.0
+
+submap:
+  scans: 20             # merge the last 20 scans (KITTI cut to 400 points/scan: recall 0 -> 0.68 at precision 1.0)
+  max_dist: 15.0        # m, but only those within 15 m of travel
 
 loop:
   exclude_recent: 50

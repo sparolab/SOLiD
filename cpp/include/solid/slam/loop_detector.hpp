@@ -36,6 +36,9 @@ struct Params {
   double keyframe_dist = 1.0;       // m, new keyframe after this much translation
   double keyframe_angle_deg = 10.0; // deg, ... or this much rotation
 
+  int submap_scans = 1;         // scans merged into each keyframe's descriptor (1 = single scan)
+  double submap_max_dist = 0.0; // m, only merge scans within this travel distance (0 = no limit)
+
   int exclude_recent = 50;      // skip the last N keyframes when searching
   double min_score = 0.99;      // min cosine similarity of R-SOLiD
   int max_candidates = 1;       // candidates reported per keyframe
@@ -122,6 +125,55 @@ class LoopDetector {
   const std::vector<Loop>& loops() const { return loops_; }
   // Descriptor of the latest keyframe (before normalization).
   const solid::Descriptor& last_descriptor() const { return last_; }
+  // Cloud of the latest keyframe in its sensor frame: the merged submap when
+  // submap_scans > 1 (what the descriptor was built from and what a session saves).
+  const std::vector<Eigen::Vector3f>& last_points() const { return last_pts_; }
+  const std::vector<float>& last_intensity() const { return last_int_; }
+
+  // Feed every scan (sensor-frame points, pose of the sensor). Keeps the last
+  // `submap_scans` scans; when the pose starts a new keyframe, merges them into
+  // the keyframe's frame and adds the keyframe. Returns true if a keyframe was
+  // added; its loop candidates are appended to `loops_out`.
+  bool process(double stamp, const Eigen::Isometry3d& pose, const std::vector<Eigen::Vector3f>& pts,
+               const std::vector<float>* weights, const std::vector<float>* intensity,
+               std::vector<Loop>& loops_out) {
+    if (params_.submap_scans > 1) {
+      Scan s;
+      s.pose = pose;
+      s.pts = pts;
+      if (weights) s.w = *weights;
+      if (intensity) s.inten = *intensity;
+      buffer_.push_back(std::move(s));
+      while (static_cast<int>(buffer_.size()) > params_.submap_scans) buffer_.pop_front();
+      if (params_.submap_max_dist > 0.0)
+        while (buffer_.size() > 1 && (buffer_.front().pose.translation() - pose.translation()).norm() >
+                                         params_.submap_max_dist)
+          buffer_.pop_front();
+    }
+    if (!is_keyframe(pose)) return false;
+
+    if (params_.submap_scans <= 1) {
+      last_pts_ = pts;
+      last_int_ = intensity ? *intensity : std::vector<float>();
+      merged_w_ = weights ? *weights : std::vector<float>();
+    } else {
+      last_pts_.clear();
+      last_int_.clear();
+      merged_w_.clear();
+      const Eigen::Isometry3d inv = pose.inverse();
+      for (const Scan& s : buffer_) {
+        const Eigen::Isometry3f T = (inv * s.pose).cast<float>();
+        for (std::size_t i = 0; i < s.pts.size(); ++i) {
+          last_pts_.push_back(T * s.pts[i]);
+          last_int_.push_back(i < s.inten.size() ? s.inten[i] : 0.0f);
+          if (!s.w.empty()) merged_w_.push_back(i < s.w.size() ? s.w[i] : 0.0f);
+        }
+      }
+    }
+    const auto loops = add_keyframe(stamp, pose, last_pts_, merged_w_.empty() ? nullptr : &merged_w_);
+    loops_out.insert(loops_out.end(), loops.begin(), loops.end());
+    return true;
+  }
 
   // True if `pose` is far enough from the last keyframe to start a new one.
   bool is_keyframe(const Eigen::Isometry3d& pose) const {
@@ -197,6 +249,15 @@ class LoopDetector {
   std::vector<Loop> loops_;
   std::deque<std::pair<std::size_t, solid::Descriptor>> pending_;
   solid::Descriptor last_;
+
+  struct Scan {
+    Eigen::Isometry3d pose;
+    std::vector<Eigen::Vector3f> pts;
+    std::vector<float> w, inten;
+  };
+  std::deque<Scan> buffer_;
+  std::vector<Eigen::Vector3f> last_pts_;
+  std::vector<float> last_int_, merged_w_;
 };
 
 }  // namespace slam

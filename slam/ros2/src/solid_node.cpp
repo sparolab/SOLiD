@@ -102,7 +102,8 @@ class SolidNode : public rclcpp::Node {
  private:
   void callback(const Cloud::ConstSharedPtr& cloud, const Odom::ConstSharedPtr& odom) {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
-    if (!detector_->is_keyframe(pose)) return;
+    // With a single-scan descriptor, only keyframes need their points.
+    if (params_.submap_scans <= 1 && !detector_->is_keyframe(pose)) return;
 
     solid::slam::CloudView view;
     view.data = cloud->data.data();
@@ -129,13 +130,15 @@ class SolidNode : public rclcpp::Node {
 
     const Eigen::Isometry3d world_to_body = pose.inverse();
     solid::slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
-                          session_->enabled() ? &intensity_ : nullptr);
+                          &intensity_);
 
     const auto t0 = std::chrono::steady_clock::now();
-    const auto loops = detector_->add_keyframe(to_sec(cloud->header.stamp), pose, pts_,
-                                               w_.empty() ? nullptr : &w_);
-    session_->add_keyframe(detector_->keyframes().back().id, pts_, intensity_,
-                           detector_->last_descriptor());
+    std::vector<solid::slam::Loop> loops;
+    if (!detector_->process(to_sec(cloud->header.stamp), pose, pts_, w_.empty() ? nullptr : &w_,
+                            &intensity_, loops))
+      return;
+    session_->add_keyframe(detector_->keyframes().back().id, detector_->last_points(),
+                           detector_->last_intensity(), detector_->last_descriptor());
     const double ms =
         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
 

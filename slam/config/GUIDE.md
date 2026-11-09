@@ -23,6 +23,8 @@ Copy the closest one for a new sensor and pass its path as `config`.
 | | `use_weight` | `true`: each point counts with its `input.weight_field` value (radar power) instead of 1 |
 | | `knn` | KD-tree neighbours re-scored per query |
 | `keyframe` | `dist`, `angle_deg` | a new keyframe after this much translation (m) or rotation (deg) |
+| `submap` | `scans` | scans merged (with the odometry poses) into each keyframe's descriptor; 1 = single scan |
+| | `max_dist` | m, only merge scans within this travel distance (0 = no limit) |
 | `loop` | `exclude_recent` | the latest N keyframes are never matched (they are trivially similar) |
 | | `min_score` | minimum R-SOLiD cosine similarity of a candidate |
 | | `max_candidates` | candidates reported per keyframe |
@@ -42,6 +44,19 @@ Copy the closest one for a new sensor and pass its path as `config`.
 | Kimera-Multi sparkal1, VLP-16 | KISS-ICP (ROS 2) | 0.98 | 23 | 0.74 (0.70 at 0.985) |
 
 To tune it for your data, run the Mac tool with `--gt-radius` on a sequence with ground truth poses, or run the node with `min_score: 0` and filter `loops.csv` by score afterwards.
+
+## Sparse sensors: submaps
+
+A single 4D radar scan (a few hundred points) is too sparse for place recognition. With `submap.scans > 1`, the last scans are merged into the keyframe's frame with the odometry poses before the descriptor is computed; the merged cloud is also what the session saves in `Scans/`. On KITTI 00 cut down to 400 random points per scan (no voxel filter):
+
+| `submap.scans` | `min_score` | Loops | Precision | Recall |
+| --- | --- | --- | --- | --- |
+| 1 | 0.97 | 26 | 0.27 | 0.01 |
+| 10 | 0.98 | 538 | 0.86 | 0.89 |
+| 10 | 0.99 | 202 | 1.00 | 0.39 |
+| 20 | 0.99 | 352 | 1.00 | 0.68 |
+
+Recall here is the share of keyframes that revisit a place (within 5 m, more than 50 keyframes earlier) and get a correct candidate. `radar_4d.yaml` uses 20 scans within 15 m.
 
 ## Pitfalls
 

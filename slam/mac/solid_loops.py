@@ -54,6 +54,9 @@ def load_params(path: str):
     kf, lp, inp = raw.get("keyframe") or {}, raw.get("loop") or {}, raw.get("input") or {}
     p.keyframe_dist = float(kf.get("dist", p.keyframe_dist))
     p.keyframe_angle_deg = float(kf.get("angle_deg", p.keyframe_angle_deg))
+    sm = raw.get("submap") or {}
+    p.submap_scans = int(sm.get("scans", p.submap_scans))
+    p.submap_max_dist = float(sm.get("max_dist", p.submap_max_dist))
     p.exclude_recent = int(lp.get("exclude_recent", p.exclude_recent))
     p.min_score = float(lp.get("min_score", p.min_score))
     p.max_candidates = int(lp.get("max_candidates", p.max_candidates))
@@ -286,14 +289,18 @@ def main() -> None:
     t0, n_scans, t_desc = time.time(), 0, 0.0
     for stamp, pose, pts, w, inten in frames:
         n_scans += 1
-        if not det.is_keyframe(pose):
-            continue
+        if p.submap_scans <= 1 and not det.is_keyframe(pose):
+            continue  # single-scan descriptors: only keyframes matter
         t = time.perf_counter()
-        for l in det.add_keyframe(stamp, pose, pts, w if p.weight_field else None):
+        is_kf, loops = det.process(stamp, pose, pts, w if p.weight_field else None, inten)
+        if not is_kf:
+            continue
+        for l in loops:
             print(f"[loop] kf {l.query_id:5d} -> {l.match_id:5d}  score {l.score:.3f}  "
                   f"yaw {np.degrees(l.yaw_rad):7.1f} deg")
         t_desc += time.perf_counter() - t
-        session.add_keyframe(det.num_keyframes - 1, pts, inten, det.last_descriptor())
+        session.add_keyframe(det.num_keyframes - 1, det.last_points(), det.last_intensity(),
+                             det.last_descriptor())
 
     session.finish(det)
     plot(det, p.keyframe_dist, os.path.join(args.out, "loops.png"), args.show)

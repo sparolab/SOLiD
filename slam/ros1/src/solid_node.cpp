@@ -87,7 +87,8 @@ class SolidNode {
   void callback(const sensor_msgs::PointCloud2::ConstPtr& cloud,
                 const nav_msgs::Odometry::ConstPtr& odom) {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
-    if (!detector_->is_keyframe(pose)) return;
+    // With a single-scan descriptor, only keyframes need their points.
+    if (params_.submap_scans <= 1 && !detector_->is_keyframe(pose)) return;
 
     solid::slam::CloudView view;
     view.data = cloud->data.data();
@@ -113,13 +114,15 @@ class SolidNode {
 
     const Eigen::Isometry3d world_to_body = pose.inverse();
     solid::slam::to_points(view, params_.cloud_in_world ? &world_to_body : nullptr, pts_, w_,
-                          session_->enabled() ? &intensity_ : nullptr);
+                          &intensity_);
 
     const ros::WallTime t0 = ros::WallTime::now();
-    const auto loops = detector_->add_keyframe(cloud->header.stamp.toSec(), pose, pts_,
-                                               w_.empty() ? nullptr : &w_);
-    session_->add_keyframe(detector_->keyframes().back().id, pts_, intensity_,
-                           detector_->last_descriptor());
+    std::vector<solid::slam::Loop> loops;
+    if (!detector_->process(cloud->header.stamp.toSec(), pose, pts_, w_.empty() ? nullptr : &w_,
+                            &intensity_, loops))
+      return;
+    session_->add_keyframe(detector_->keyframes().back().id, detector_->last_points(),
+                           detector_->last_intensity(), detector_->last_descriptor());
     const double ms = (ros::WallTime::now() - t0).toSec() * 1e3;
 
     const auto& kfs = detector_->keyframes();
