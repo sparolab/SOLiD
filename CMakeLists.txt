@@ -16,6 +16,7 @@ foreach(_conda "$ENV{CONDA_PREFIX}" "$ENV{HOME}/anaconda3" "$ENV{HOME}/miniconda
 endforeach()
 
 find_package(Eigen3 REQUIRED)
+set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
 set(CORE "${CMAKE_CURRENT_SOURCE_DIR}/cpp")
@@ -28,8 +29,11 @@ pybind11_add_module(_core
 )
 target_include_directories(_core PRIVATE ${CORE}/include ${CORE}/third_party)
 target_link_libraries(_core PRIVATE Eigen3::Eigen)
-# Static C++ runtime so the extension imports under any Python (incl. Conda envs
-# such as the GS-ICP-SLAM environment).
-target_link_options(_core PRIVATE -static-libstdc++ -static-libgcc)
+# Static C++ runtime (GCC only) so the extension imports under any Python,
+# including Conda envs with an older libstdc++. Apple clang uses libc++ and
+# rejects these flags.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_link_options(_core PRIVATE -static-libstdc++ -static-libgcc)
+endif()
 
 install(TARGETS _core LIBRARY DESTINATION solid)
