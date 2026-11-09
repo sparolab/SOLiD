@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="250" viewBox="0 0 960 250">
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="200" viewBox="0 0 960 200">
 <style>.t{font:700 18px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#e6edf3}.d{font:400 13px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#9198a1}.n{font:800 13px Inter,"Segoe UI",Helvetica,Arial,sans-serif}</style>
-<rect x="6" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
-<rect x="246" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
-<rect x="486" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
-<rect x="726" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="6" y="6" width="228" height="188" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="246" y="6" width="228" height="188" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="486" y="6" width="228" height="188" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="726" y="6" width="228" height="188" rx="14" fill="#161b22" stroke="#30363d"/>
 <path d="M52 104 L70 80 L150 80 L176 104 L188 106 L188 122 L44 122 L44 106 Z" fill="#7986CB"/>
 <path d="M80 86 L108 86 L108 102 L68 102 Z M116 86 L146 86 L164 102 L116 102 Z" fill="#161b22" opacity="0.9"/>
 <circle cx="80" cy="124" r="11" fill="#e6edf3"/><circle cx="156" cy="124" r="11" fill="#e6edf3"/>
@@ -29,15 +29,7 @@
 <path d="M822 80 L806 106 M858 80 L874 106" stroke="#e6edf3" stroke-width="5" stroke-linecap="round"/>
 <path d="M832 114 L828 140 M848 114 L852 140" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
 <text class="t" x="24" y="178">Car · LiDAR</text>
-<text class="d" x="24" y="200">KISS-ICP, FAST-LIO</text>
-<text class="n" x="24" y="222" fill="#7986CB">KITTI 00: ATE 3.93 → 1.13 m</text>
 <text class="t" x="264" y="178">4D radar</text>
-<text class="d" x="264" y="200">GeoRIO</text>
-<text class="n" x="264" y="222" fill="#F06292">SNAIL: ATE 0.47 → 0.19 m</text>
 <text class="t" x="504" y="178">Legged</text>
-<text class="d" x="504" y="200">GaRLILEO (radar), Leg-KILO</text>
-<text class="n" x="504" y="222" fill="#4DB6AC">Spot: ATE 0.42 → 0.30 m</text>
 <text class="t" x="744" y="178">Humanoid · Livox</text>
-<text class="d" x="744" y="200">FAST-LIO (Mid-360)</text>
-<text class="n" x="744" y="222" fill="#FFB74D">KILVO: 9 false loops rejected</text>
 </svg>

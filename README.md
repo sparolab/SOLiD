@@ -47,7 +47,7 @@ It runs on top of the odometry you already have, on cars, legged robots and huma
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="fig/platforms_dark.svg" />
-    <img src="fig/platforms_light.svg" alt="Car with LiDAR (KISS-ICP, FAST-LIO): KITTI 00 ATE 3.93 to 1.13 m. 4D radar (GeoRIO): SNAIL ATE 0.47 to 0.19 m. Legged robot with radar (GaRLILEO): ATE 0.42 to 0.30 m. Humanoid with Livox (FAST-LIO): 9 false loops rejected on KILVO." width="95%" />
+    <img src="fig/platforms_light.svg" alt="SOLiD runs on a car with LiDAR (KISS-ICP, FAST-LIO), 4D radar (GeoRIO), legged robots (GaRLILEO, Leg-KILO) and a humanoid with a Livox Mid-360 (FAST-LIO)" width="95%" />
   </picture>
 </p>
 
