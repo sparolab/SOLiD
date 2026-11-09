@@ -1,0 +1,20 @@
+<launch>
+  <!-- FAST-LIO (ROS 1) on a Livox Mid-360 + SOLiD loop candidates (e.g. the KILVO humanoid, Unitree G1).
+       The Mid-360 IMU is inside the LiDAR, so FAST-LIO's body frame is the LiDAR frame and
+       /cloud_registered_body can go to SOLiD directly. KILVO bags use livox_ros_driver2 messages:
+       convert them first with tools/livox2_to_livox1.py. -->
+  <arg name="solid_config" default="livox_mid360" />
+  <arg name="save_dir" default="" />
+
+  <include file="$(find fast_lio)/launch/mapping_mid360.launch">
+    <arg name="rviz" value="false" />
+  </include>
+
+  <include file="$(find solid_ros)/launch/solid.launch">
+    <arg name="config" value="$(arg solid_config)" />
+    <arg name="cloud_topic" value="/cloud_registered_body" />
+    <arg name="odom_topic" value="/Odometry" />
+    <arg name="save_dir" value="$(arg save_dir)" />
+    <arg name="rviz" value="false" />
+  </include>
+</launch>

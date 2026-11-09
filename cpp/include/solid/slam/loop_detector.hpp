@@ -31,7 +31,7 @@ namespace solid {
 namespace slam {
 
 struct Params {
-  solid::Config solid;          // descriptor + database (slam/config/*.yaml `solid:`)
+  solid::Config solid;          // descriptor + database (config/*.yaml `solid:`)
 
   double keyframe_dist = 1.0;       // m, new keyframe after this much translation
   double keyframe_angle_deg = 10.0; // deg, ... or this much rotation
@@ -44,6 +44,9 @@ struct Params {
   int max_candidates = 1;       // candidates reported per keyframe
 
   bool cloud_in_world = false;  // true if the input cloud is in the odometry frame
+  // Pose of the point cloud's sensor in the odometry body frame (e.g. LiDAR in IMU for
+  // FAST-LIO's /Odometry). Keyframe poses, submaps and loop closing use the sensor pose.
+  Eigen::Isometry3d extrinsic = Eigen::Isometry3d::Identity();
   std::string weight_field;     // per-point weight field (e.g. radar power), "" = none
 };
 
@@ -134,9 +137,16 @@ class LoopDetector {
   // `submap_scans` scans; when the pose starts a new keyframe, merges them into
   // the keyframe's frame and adds the keyframe. Returns true if a keyframe was
   // added; its loop candidates are appended to `loops_out`.
-  bool process(double stamp, const Eigen::Isometry3d& pose, const std::vector<Eigen::Vector3f>& pts,
-               const std::vector<float>* weights, const std::vector<float>* intensity,
-               std::vector<Loop>& loops_out) {
+  // Sensor pose for an odometry (body) pose.
+  Eigen::Isometry3d sensor_pose(const Eigen::Isometry3d& odom_pose) const {
+    return odom_pose * params_.extrinsic;
+  }
+
+  // `odom_pose` is the odometry pose of the body; points are in the sensor frame.
+  bool process(double stamp, const Eigen::Isometry3d& odom_pose,
+               const std::vector<Eigen::Vector3f>& pts, const std::vector<float>* weights,
+               const std::vector<float>* intensity, std::vector<Loop>& loops_out) {
+    const Eigen::Isometry3d pose = sensor_pose(odom_pose);
     if (params_.submap_scans > 1) {
       Scan s;
       s.pose = pose;

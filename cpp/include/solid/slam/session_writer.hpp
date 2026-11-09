@@ -5,7 +5,8 @@
 //   <dir>/Scans/000000.pcd               keyframe cloud, sensor frame (binary PCD, x y z intensity)
 //   <dir>/SCDs/000000.scd                Scan Context (20 x 60), read by LT-SLAM
 //   <dir>/SOLiDs/000000.txt              SOLiD descriptor (line 1: R-SOLiD, line 2: A-SOLiD)
-//   <dir>/singlesession_posegraph.g2o    keyframe poses + odometry edges
+//   <dir>/singlesession_posegraph.g2o    keyframe poses + odometry edges (+ verified loops)
+//   <dir>/optimized_poses.txt            KITTI poses after loop closing (if enabled)
 //   <dir>/odom_poses.txt, times.txt      KITTI-format poses and keyframe stamps
 //   <dir>/keyframes.txt, loops.csv       TUM poses and SOLiD loop candidates
 //
@@ -54,6 +55,12 @@ inline Eigen::MatrixXd make_scan_context(const std::vector<Eigen::Vector3f>& pts
   return desc;
 }
 
+// A loop that the back-end verified: pose of keyframe `to` in keyframe `from`.
+struct VerifiedLoop {
+  std::size_t from = 0, to = 0;
+  Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
+};
+
 class SessionWriter {
  public:
   // Creates <dir> and its sub-folders. `dir` empty = disabled.
@@ -86,7 +93,10 @@ class SessionWriter {
   }
 
   // Writes the pose graph, KITTI poses, stamps, TUM keyframes and loop candidates.
-  bool finish(const LoopDetector& det) const {
+  // With loop closing, pass the optimized poses and the verified loops: the g2o file
+  // then holds the optimized vertices and the loop edges, and optimized_poses.txt is added.
+  bool finish(const LoopDetector& det, const std::vector<Eigen::Isometry3d>* optimized = nullptr,
+              const std::vector<VerifiedLoop>* verified = nullptr) const {
     if (!enabled()) return false;
     const auto& kfs = det.keyframes();
     std::ofstream g2o(dir_ + "/singlesession_posegraph.g2o");
@@ -96,8 +106,9 @@ class SessionWriter {
     g2o << std::fixed << std::setprecision(9);
     kitti << std::setprecision(9);
     times << std::fixed << std::setprecision(9);
+    const bool opt = optimized && optimized->size() == kfs.size();
     for (const Keyframe& k : kfs) {
-      g2o << "VERTEX_SE3:QUAT " << k.id << ' ' << pose_str(k.pose) << '\n';
+      g2o << "VERTEX_SE3:QUAT " << k.id << ' ' << pose_str(opt ? (*optimized)[k.id] : k.pose) << '\n';
       const Eigen::Matrix<double, 3, 4> m = k.pose.matrix().topRows<3>();
       for (int r = 0; r < 3; ++r)
         for (int c = 0; c < 4; ++c) kitti << m(r, c) << ((r == 2 && c == 3) ? '\n' : ' ');
@@ -108,6 +119,18 @@ class SessionWriter {
     for (std::size_t i = 1; i < kfs.size(); ++i) {
       g2o << "EDGE_SE3:QUAT " << kfs[i - 1].id << ' ' << kfs[i].id << ' '
           << pose_str(kfs[i - 1].pose.inverse() * kfs[i].pose) << ' ' << kInfo << '\n';
+    }
+    if (verified)
+      for (const VerifiedLoop& l : *verified)
+        g2o << "EDGE_SE3:QUAT " << l.from << ' ' << l.to << ' ' << pose_str(l.T) << ' ' << kInfo << '\n';
+    if (opt) {
+      std::ofstream o(dir_ + "/optimized_poses.txt");
+      o << std::setprecision(9);
+      for (const auto& T : *optimized) {
+        const Eigen::Matrix<double, 3, 4> m = T.matrix().topRows<3>();
+        for (int r = 0; r < 3; ++r)
+          for (int c = 0; c < 4; ++c) o << m(r, c) << ((r == 2 && c == 3) ? '\n' : ' ');
+      }
     }
     return det.save(dir_);
   }

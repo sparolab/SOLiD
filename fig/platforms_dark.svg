@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="250" viewBox="0 0 960 250">
+<style>.t{font:700 18px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#e6edf3}.d{font:400 13px Inter,"Segoe UI",Helvetica,Arial,sans-serif;fill:#9198a1}.n{font:800 13px Inter,"Segoe UI",Helvetica,Arial,sans-serif}</style>
+<rect x="6" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="246" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="486" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
+<rect x="726" y="6" width="228" height="238" rx="14" fill="#161b22" stroke="#30363d"/>
+<path d="M52 104 L70 80 L150 80 L176 104 L188 106 L188 122 L44 122 L44 106 Z" fill="#7986CB"/>
+<path d="M80 86 L108 86 L108 102 L68 102 Z M116 86 L146 86 L164 102 L116 102 Z" fill="#161b22" opacity="0.9"/>
+<circle cx="80" cy="124" r="11" fill="#e6edf3"/><circle cx="156" cy="124" r="11" fill="#e6edf3"/>
+<rect x="104" y="64" width="14" height="14" rx="3" fill="#7986CB"/>
+<ellipse cx="111" cy="62" rx="34" ry="7" fill="none" stroke="#7986CB" stroke-width="2" stroke-dasharray="3 4"/>
+<ellipse cx="111" cy="62" rx="52" ry="11" fill="none" stroke="#7986CB" stroke-width="1.5" stroke-dasharray="2 5" opacity="0.6"/>
+<rect x="300" y="84" width="44" height="40" rx="8" fill="#F06292"/>
+<rect x="308" y="92" width="28" height="24" rx="4" fill="#161b22" opacity="0.35"/>
+<path d="M357.0 81.38 A26 26 0 0 1 357.0 126.62" transform="translate(-5.0,0)" fill="none" stroke="#F06292" stroke-width="3" stroke-linecap="round" opacity="1.0"/>
+<path d="M366.0 65.72 A44 44 0 0 1 366.0 142.28" transform="translate(-14.0,0)" fill="none" stroke="#F06292" stroke-width="3" stroke-linecap="round" opacity="0.73"/>
+<path d="M375.0 50.06 A62 62 0 0 1 375.0 157.94" transform="translate(-23.0,0)" fill="none" stroke="#F06292" stroke-width="3" stroke-linecap="round" opacity="0.45999999999999996"/>
+<rect x="542" y="74" width="100" height="26" rx="10" fill="#4DB6AC"/>
+<rect x="630" y="66" width="26" height="18" rx="5" fill="#4DB6AC"/>
+<rect x="644" y="70" width="8" height="10" rx="2" fill="#161b22" opacity="0.7"/>
+<path d="M550 96 L560 114 L550 132" fill="none" stroke="#e6edf3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M568 96 L558 114 L568 132" fill="none" stroke="#e6edf3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M616 96 L626 114 L616 132" fill="none" stroke="#e6edf3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M634 96 L624 114 L634 132" fill="none" stroke="#e6edf3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="840" cy="58" r="13" fill="#FFB74D"/>
+<rect x="832" y="40" width="16" height="7" rx="2" fill="#e6edf3"/>
+<path d="M824 34 Q840 22 856 34" fill="none" stroke="#FFB74D" stroke-width="2" stroke-dasharray="2 3"/>
+<rect x="822" y="74" width="36" height="40" rx="9" fill="#FFB74D"/>
+<path d="M822 80 L806 106 M858 80 L874 106" stroke="#e6edf3" stroke-width="5" stroke-linecap="round"/>
+<path d="M832 114 L828 140 M848 114 L852 140" stroke="#e6edf3" stroke-width="6" stroke-linecap="round"/>
+<text class="t" x="24" y="178">Car · LiDAR</text>
+<text class="d" x="24" y="200">KISS-ICP, FAST-LIO</text>
+<text class="n" x="24" y="222" fill="#7986CB">KITTI 00: ATE 3.93 → 1.13 m</text>
+<text class="t" x="264" y="178">4D radar</text>
+<text class="d" x="264" y="200">GeoRIO</text>
+<text class="n" x="264" y="222" fill="#F06292">SNAIL: ATE 0.47 → 0.19 m</text>
+<text class="t" x="504" y="178">Legged · radar</text>
+<text class="d" x="504" y="200">GaRLILEO</text>
+<text class="n" x="504" y="222" fill="#4DB6AC">Spot: ATE 0.42 → 0.30 m</text>
+<text class="t" x="744" y="178">Humanoid · Livox</text>
+<text class="d" x="744" y="200">FAST-LIO (Mid-360)</text>
+<text class="n" x="744" y="222" fill="#FFB74D">KILVO: 9 false loops rejected</text>
+</svg>

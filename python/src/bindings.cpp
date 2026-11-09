@@ -132,7 +132,10 @@ PYBIND11_MODULE(_core, m) {
       .def_readwrite("min_score", &Params::min_score)
       .def_readwrite("max_candidates", &Params::max_candidates)
       .def_readwrite("cloud_in_world", &Params::cloud_in_world)
-      .def_readwrite("weight_field", &Params::weight_field);
+      .def_readwrite("weight_field", &Params::weight_field)
+      .def_property("extrinsic",
+                    [](const Params& p) { return Eigen::Matrix4d(p.extrinsic.matrix()); },
+                    [](Params& p, const Eigen::Matrix4d& m) { p.extrinsic = toIso(m); });
   py::class_<solid::slam::Loop>(sm, "Loop")
       .def_readonly("query_id", &solid::slam::Loop::query_id)
       .def_readonly("match_id", &solid::slam::Loop::match_id)
@@ -167,6 +170,9 @@ PYBIND11_MODULE(_core, m) {
            py::arg("stamp"), py::arg("pose"), py::arg("points"), py::arg("weights") = py::none(),
            py::arg("intensity") = py::none(),
            "Feed one scan; returns (is_keyframe, loops). Merges the last submap_scans scans.")
+      .def("sensor_pose", [](const LoopDetector& d, const Eigen::Matrix4d& odom_pose) {
+             return Eigen::Matrix4d(d.sensor_pose(toIso(odom_pose)).matrix());
+           }, py::arg("odom_pose"))
       .def("last_points", [](const LoopDetector& d) {
         const auto& p = d.last_points();
         py::array_t<float> a({static_cast<py::ssize_t>(p.size()), static_cast<py::ssize_t>(3)});
@@ -200,7 +206,8 @@ PYBIND11_MODULE(_core, m) {
              w.add_keyframe(id, p, optFloats(intensity, p.size(), "intensity"), d);
            },
            py::arg("id"), py::arg("points"), py::arg("intensity"), py::arg("descriptor"))
-      .def("finish", &SessionWriter::finish, py::arg("detector"));
+      .def("finish", [](const SessionWriter& w, const LoopDetector& d) { return w.finish(d); },
+           py::arg("detector"));
   sm.def("make_scan_context",
          [](const py::array_t<float, py::array::c_style | py::array::forcecast>& pts) {
            return solid::slam::make_scan_context(npToPoints(pts));

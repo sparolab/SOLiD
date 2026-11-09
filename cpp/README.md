@@ -1,23 +1,29 @@
 # SOLiD library (cpp)
 
-The single C++ source of truth. The Python package, the ROS 1 / ROS 2 nodes, the
-Mac tool and multi-session SLAM all link these targets; none of them has its own
-copy of the algorithm.
+The single C++ source of truth, laid out like a ROS-independent core library: the ROS 1 / ROS 2
+packages, the Python package and the macOS tools are thin wrappers around these targets.
 
 | Target | What | Needs |
 | --- | --- | --- |
 | `solid::core` | descriptor extraction + KD-tree retrieval (`Extractor`, `Database`) | Eigen (PCL optional) |
-| `solid::slam` | keyframes and loop candidates (`slam::LoopDetector`), LT-mapper session writer (`slam::SessionWriter`), YAML loader | header-only; yaml-cpp for the loader |
-| `solid::multi_session` | session loading, SOLiD inter-session search, GICP check, consensus, GTSAM graph (`ms::Aligner`) | PCL, GTSAM, yaml-cpp |
+| `solid::slam` | keyframes, submaps and loop candidates (`slam::LoopDetector`), LT-mapper session writer (`slam::SessionWriter`), YAML loader | header-only; yaml-cpp for the loader |
+| `solid::backend` | online loop closing (`backend::LoopCloser`: GICP check + iSAM2), session loading and multi-session alignment (`backend::Aligner`) | PCL (common, filters, registration), GTSAM, yaml-cpp |
 
 ```bash
-cmake -S . -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_MULTI_SESSION=ON
+cmake -S . -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON
 cmake --build build -j && sudo cmake --install build
 ```
 ```cmake
-find_package(solid REQUIRED COMPONENTS slam multi_session)
-target_link_libraries(my_app solid::multi_session)
+find_package(solid REQUIRED COMPONENTS slam backend)
+target_link_libraries(my_slam solid::backend)
 ```
+
+ROS-free tools (`examples/`, built with the back-end):
+
+| Tool | |
+| --- | --- |
+| `solid_close_loops <session> <config.yaml> [out]` | replays a saved session through `LoopCloser`: optimized poses + every checked candidate |
+| `solid_align_sessions <config.yaml> <out> <central> <session> ...` | multi-session alignment of saved sessions |
 
 ## Layout
 
@@ -25,11 +31,12 @@ target_link_libraries(my_app solid::multi_session)
 cpp/
 ├── include/solid/
 │   ├── config.hpp, descriptor.hpp, extractor.hpp, database.hpp   # solid::core
-│   ├── slam/            loop_detector.hpp, session_writer.hpp, config_yaml.hpp
-│   └── multi_session/   session.hpp, aligner.hpp, params_yaml.hpp
-├── src/                 extractor.cpp, database.cpp, multi_session/*.cpp
+│   ├── slam/      loop_detector.hpp, session_writer.hpp, config_yaml.hpp
+│   └── backend/   loop_closer.hpp, aligner.hpp, session.hpp, params_yaml.hpp
+├── src/           extractor.cpp, database.cpp, backend/*.cpp
+├── examples/      close_loops.cpp, align_sessions.cpp
 ├── third_party/nanoflann.hpp
-└── test/                verify_golden.cpp (needs SOLID_USE_PCL=ON), test_solid_core.cpp
+└── test/          verify_golden.cpp (needs SOLID_USE_PCL=ON), test_solid_core.cpp
 ```
 
 ## Design notes

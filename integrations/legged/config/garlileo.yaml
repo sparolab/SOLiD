@@ -1,0 +1,47 @@
+# GaRLILEO (legged robot, TI IWR1843 radar, about 30 points per scan): radar_4d.yaml with a longer submap.
+# Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
+# Remove dynamic points (e.g. with Doppler) before the cloud reaches SOLiD.
+# A single radar scan is too sparse to recognize a place, so each keyframe's
+# descriptor is built from a submap of the last scans.
+
+solid:
+  fov_up: 15.0
+  fov_down: -15.0
+  num_angle: 60
+  num_range: 40
+  num_height: 8         # coarse elevation bins: radar is sparse
+  min_range: 0.5
+  max_range: 60.0
+  voxel_size: 0.0       # no downsampling, keeps weights aligned with points
+  use_weight: false     # true: weight bins by `input.weight_field` (needs a real power/RCS field)
+  knn: 30
+  min_similarity: 0.0
+
+keyframe:
+  dist: 1.0
+  angle_deg: 10.0
+
+submap:
+  scans: 50             # 2.5 s at 20 Hz (BridgeLoop: single scan recall 0.03 -> 0.70 at precision 0.95)
+  max_dist: 0.0         # no distance limit: a legged robot walks slowly
+
+loop:
+  exclude_recent: 50
+  min_score: 0.98       # GaRLILEO BridgeLoop: precision 0.95, recall 0.70 (0.99: 0.99 / 0.49)
+  max_candidates: 1
+
+input:
+  cloud_in_world: false
+  weight_field: ""      # e.g. "power" / "rcs" when use_weight is true; check your driver's fields
+
+loop_closing:           # verify candidates with GICP and optimize the pose graph (solid::backend)
+  enable: true
+  submap_keyframes: 3   # +- keyframes on top of the submaps above
+  scan_voxel: 0.2       # m
+  icp_voxel: 0.5        # m
+  icp_max_dist: 3.0     # m, radar points are noisy
+  icp_max_fitness: 1.0  # m^2
+  odom_sigma_trans: 0.1
+  odom_sigma_rot_deg: 1.0
+  loop_sigma_trans: 1.0
+  loop_sigma_rot_deg: 5.0

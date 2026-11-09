@@ -1,0 +1,45 @@
+# FAST-LIO (ROS 2 branch of hku-mars/FAST_LIO) for Kimera-Multi sparkal1 (VLP-16 + RealSense D455 forward IMU).
+/**:
+    ros__parameters:
+        feature_extract_enable: false
+        point_filter_num: 4
+        max_iteration: 3
+        filter_size_surf: 0.5
+        filter_size_map: 0.5
+        cube_side_length: 1000.0
+        runtime_pos_log_enable: false
+        common:
+            lid_topic:  "/sparkal1/lidar_points"
+            imu_topic:  "/sparkal1/forward/imu"
+            time_sync_en: false
+            time_offset_lidar_to_imu: 0.0
+
+        preprocess:
+            lidar_type: 2
+            scan_line: 16
+            scan_rate: 10
+            timestamp_unit: 2
+            blind: 1.6              # upstream has no blind_for_human_pilot; use it as the blind radius
+
+        mapping:
+            acc_cov: 0.1
+            gyr_cov: 0.1
+            b_acc_cov: 0.003
+            b_gyr_cov: 0.001
+            fov_degree: 360
+            det_range: 100.0
+            extrinsic_est_en: false
+            extrinsic_T: [ 0.07025405, -0.10158666, -0.04942693 ]
+            extrinsic_R: [-2.9046527369e-02, -9.9957706196e-01, -1.7154151723e-03,
+                          -6.9278006858e-02,  3.7251435690e-03, -9.9759064383e-01,
+                           9.9717458733e-01, -2.8857692625e-02, -6.9356874944e-02 ]
+
+        publish:
+            path_en: true
+            scan_publish_en: true
+            dense_publish_en: true
+            scan_bodyframe_pub_en: true
+
+        pcd_save:
+            pcd_save_en: false
+            interval: -1

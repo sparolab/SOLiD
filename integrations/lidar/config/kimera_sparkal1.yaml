@@ -1,0 +1,51 @@
+# Kimera-Multi sparkal1 with FAST-LIO: vlp16.yaml + the LiDAR pose in FAST-LIO's IMU (body) frame.
+# Velodyne VLP-16 (vertical FOV +-15 deg, 16 rings). Tuned on Kimera-Multi campus_outdoor sparkal1
+# (1.15 km, GT revisits) with FAST-LIO and KISS-ICP, ROS 1 and ROS 2.
+# Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
+
+solid:
+  fov_up: 15.0          # deg
+  fov_down: -15.0       # deg
+  num_angle: 60         # A-SOLiD bins (yaw)
+  num_range: 40         # R-SOLiD bins (20 was worse: AP 0.26 vs 0.36)
+  num_height: 16        # = ring count (8 and 32 gave the same AP)
+  min_range: 1.6        # m, also drops the human pilot walking behind the robot
+  max_range: 80.0       # m (50 was worse: AP 0.19)
+  voxel_size: 0.4       # m (0.2 similar, 0 = no downsampling collapses: AP 0.01)
+  use_weight: false
+  knn: 30
+  min_similarity: 0.0
+
+keyframe:
+  dist: 1.0
+  angle_deg: 10.0
+
+submap:
+  scans: 1              # scans merged into each keyframe's descriptor (1 = single scan)
+  max_dist: 0.0         # m, only merge scans within this travel distance (0 = no limit)
+
+loop:
+  exclude_recent: 50
+  min_score: 0.98       # precision ~0.67-0.76 (4 runs); 0.985 -> 0.70-0.89 with ~half the loops
+  max_candidates: 1
+
+input:
+  cloud_in_world: false
+  extrinsic:            # LiDAR in the IMU frame (FAST-LIO extrinsic_T / extrinsic_R)
+    t: [0.07025405, -0.10158666, -0.04942693]
+    R: [-2.9046527369e-02, -9.9957706196e-01, -1.7154151723e-03,
+        -6.9278006858e-02,  3.7251435690e-03, -9.9759064383e-01,
+         9.9717458733e-01, -2.8857692625e-02, -6.9356874944e-02] # the clouds must be in the LiDAR frame (z up), see config/GUIDE.md
+  weight_field: ""
+
+loop_closing:           # verify candidates with GICP and optimize the pose graph (solid::backend)
+  enable: true
+  submap_keyframes: 5   # +- keyframes merged around each loop keyframe
+  scan_voxel: 0.4       # m
+  icp_voxel: 1.0        # m
+  icp_max_dist: 2.0     # m
+  icp_max_fitness: 0.3  # m^2, mean squared residual to accept a loop
+  odom_sigma_trans: 0.1
+  odom_sigma_rot_deg: 1.0
+  loop_sigma_trans: 0.5
+  loop_sigma_rot_deg: 3.0

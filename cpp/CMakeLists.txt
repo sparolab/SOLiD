@@ -5,8 +5,9 @@ project(solid LANGUAGES CXX VERSION 0.2.0)
 # Python package, multi-session SLAM) consumes these targets:
 #   solid::core           descriptor + database                  (Eigen)
 #   solid::slam           keyframe/loop detection, session writer (header-only; + yaml-cpp loader)
-#   solid::multi_session  session alignment: SOLiD + GICP + GTSAM (PCL, GTSAM, yaml-cpp)
-# Install it and use find_package(solid COMPONENTS slam multi_session), or
+#   solid::backend        loop verification + pose graph (single- and multi-session):
+#                         GICP + GTSAM (PCL, GTSAM, yaml-cpp)
+# Install it and use find_package(solid COMPONENTS slam backend), or
 # add_subdirectory() this folder.
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -25,7 +26,11 @@ foreach(_conda "$ENV{CONDA_PREFIX}" "$ENV{HOME}/anaconda3" "$ENV{HOME}/miniconda
 endforeach()
 
 option(SOLID_USE_PCL "Use PCL VoxelGrid inside solid::core (bit-identical to the golden test)" ON)
-option(SOLID_BUILD_MULTI_SESSION "Build solid::multi_session (needs PCL and GTSAM)" OFF)
+option(SOLID_BUILD_BACKEND "Build solid::backend (needs PCL and GTSAM)" OFF)
+option(SOLID_BUILD_MULTI_SESSION "Deprecated alias of SOLID_BUILD_BACKEND" OFF)
+if(SOLID_BUILD_MULTI_SESSION)
+  set(SOLID_BUILD_BACKEND ON)
+endif()
 option(BUILD_SOLID_VERIFY "Build the golden regression executable" ON)
 option(BUILD_SOLID_TESTS "Build gtest unit tests if GTest is found" OFF)
 
@@ -62,18 +67,36 @@ endif()
 add_library(solid::slam ALIAS solid_slam)
 list(APPEND SOLID_TARGETS solid_slam)
 
-# ---- solid::multi_session ----
-if(SOLID_BUILD_MULTI_SESSION)
-  find_package(PCL REQUIRED COMPONENTS common filters io registration)
+# ---- solid::backend ----
+if(SOLID_BUILD_BACKEND)
+  # Some PCL builds pull in a VTK whose targets reference MPI::MPI_C; define it first if present.
+  include(CheckLanguage)
+  check_language(C)
+  if(CMAKE_C_COMPILER)
+    enable_language(C)
+    find_package(MPI QUIET COMPONENTS C)
+  endif()
+  find_package(PCL REQUIRED COMPONENTS common filters registration)
   find_package(GTSAM REQUIRED)
   if(NOT yaml-cpp_FOUND)
-    message(FATAL_ERROR "solid::multi_session needs yaml-cpp")
+    message(FATAL_ERROR "solid::backend needs yaml-cpp")
   endif()
-  add_library(solid_multi_session src/multi_session/session.cpp src/multi_session/aligner.cpp)
-  target_include_directories(solid_multi_session PUBLIC ${PCL_INCLUDE_DIRS})
-  target_link_libraries(solid_multi_session PUBLIC solid_slam gtsam ${PCL_LIBRARIES})
-  add_library(solid::multi_session ALIAS solid_multi_session)
-  list(APPEND SOLID_TARGETS solid_multi_session)
+  add_library(solid_backend src/backend/session.cpp src/backend/aligner.cpp src/backend/loop_closer.cpp)
+  target_include_directories(solid_backend PUBLIC ${PCL_INCLUDE_DIRS})
+  target_link_libraries(solid_backend PUBLIC solid_slam gtsam ${PCL_LIBRARIES})
+  add_library(solid::backend ALIAS solid_backend)
+  list(APPEND SOLID_TARGETS solid_backend)
+
+  # ROS-free tools (like sparo-fast-lio's examples/): loop closing and multi-session alignment
+  # on saved sessions, so macOS gets the whole back-end too.
+  option(SOLID_BUILD_EXAMPLES "Build the ROS-free back-end tools" ON)
+  if(SOLID_BUILD_EXAMPLES)
+    add_executable(solid_close_loops examples/close_loops.cpp)
+    target_link_libraries(solid_close_loops PRIVATE solid_backend)
+    add_executable(solid_align_sessions examples/align_sessions.cpp)
+    target_link_libraries(solid_align_sessions PRIVATE solid_backend)
+    install(TARGETS solid_close_loops solid_align_sessions RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  endif()
 endif()
 
 # ---- tests ----
@@ -94,7 +117,7 @@ if(BUILD_SOLID_TESTS)
   endif()
 endif()
 
-# ---- install / export: find_package(solid COMPONENTS slam multi_session) ----
+# ---- install / export: find_package(solid COMPONENTS slam backend) ----
 foreach(_t ${SOLID_TARGETS})
   string(REPLACE "solid_" "" _export_name ${_t})
   set_target_properties(${_t} PROPERTIES EXPORT_NAME ${_export_name})

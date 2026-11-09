@@ -1,9 +1,10 @@
-// Loads solid_slam::Params from a slam/config/*.yaml file (yaml-cpp).
+// Loads solid_slam::Params from a config/*.yaml file (yaml-cpp).
 #ifndef SOLID_SLAM_CONFIG_YAML_HPP
 #define SOLID_SLAM_CONFIG_YAML_HPP
 
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <yaml-cpp/yaml.h>
 
@@ -57,6 +58,22 @@ inline Params load_params(const std::string& path) {
   const YAML::Node i = root["input"];
   get(i, "cloud_in_world", p.cloud_in_world);
   get(i, "weight_field", p.weight_field);
+  // input.extrinsic: {t: [x, y, z], R: [9 values, row-major]} = sensor pose in the odometry body frame
+  if (i && i["extrinsic"]) {
+    const YAML::Node e = i["extrinsic"];
+    if (e["t"]) {
+      const auto t = e["t"].as<std::vector<double>>();
+      if (t.size() == 3) p.extrinsic.translation() << t[0], t[1], t[2];
+    }
+    if (e["R"]) {
+      const auto r = e["R"].as<std::vector<double>>();
+      if (r.size() == 9) {
+        Eigen::Matrix3d R;
+        R << r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8];
+        p.extrinsic.linear() = Eigen::Quaterniond(R).normalized().toRotationMatrix();
+      }
+    }
+  }
   return p;
 }
 

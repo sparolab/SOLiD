@@ -1,0 +1,44 @@
+# Livox Mid-360 (vertical FOV -7 ~ +52 deg, non-repetitive scan).
+# Shared by the ROS 1 node, the ROS 2 node and the Mac tool.
+
+solid:
+  fov_up: 52.0          # deg
+  fov_down: -7.0        # deg
+  num_angle: 60
+  num_range: 40
+  num_height: 32
+  min_range: 1.0        # m, drops the robot's own body
+  max_range: 60.0       # m
+  voxel_size: 0.4
+  use_weight: false
+  knn: 30
+  min_similarity: 0.0
+
+keyframe:
+  dist: 1.0
+  angle_deg: 10.0
+
+submap:
+  scans: 10             # the non-repetitive pattern fills in over time (KILVO outdoor: recall 0.02 -> 0.33 at precision 1.0)
+  max_dist: 0.0
+
+loop:
+  exclude_recent: 50
+  min_score: 0.98       # KILVO outdoor_h01: precision 0.68, recall 0.44 before the GICP check
+  max_candidates: 1
+
+input:
+  cloud_in_world: false # FAST-LIO /cloud_registered_body (the Mid-360 IMU is inside the LiDAR)
+  weight_field: ""
+
+loop_closing:           # verify candidates with GICP and optimize the pose graph (solid::backend)
+  enable: true
+  submap_keyframes: 5   # +- keyframes merged around each loop keyframe
+  scan_voxel: 0.4       # m
+  icp_voxel: 1.0        # m
+  icp_max_dist: 2.0     # m
+  icp_max_fitness: 0.3  # m^2, mean squared residual to accept a loop
+  odom_sigma_trans: 0.1
+  odom_sigma_rot_deg: 1.0
+  loop_sigma_trans: 0.5
+  loop_sigma_rot_deg: 3.0

@@ -24,7 +24,7 @@ git clone https://github.com/sparolab/SOLiD.git
 cd SOLiD
 ```
 
-Layout: `cpp/` is the SOLiD library that everything links; `slam/ros1`, `slam/ros2` (package `solid_ros`) and `slam/mac` are the loop detection front-ends; `multi_session_slam/` aligns saved runs; `slam/config/` holds one YAML per sensor.
+Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop detection, loop closing, multi-session); `ros1/` and `ros2/` are the ROS packages (`solid_ros`: `solid_node`, `align_node`); `mac/` holds the ROS-free tools; `config/` holds one YAML per sensor; `integrations/` has launch files per odometry and platform.
 
 ## 3. Build
 
@@ -51,7 +51,7 @@ source devel/setup.bash
 sudo apt install -y libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
 mkdir -p ~/ros2_ws/src && ln -s "$PWD" ~/ros2_ws/src/SOLiD
 cd ~/ros2_ws && source /opt/ros/humble/setup.bash
-colcon build --base-paths src/SOLiD/slam/ros2 src/SOLiD/multi_session_slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+colcon build --base-paths src/SOLiD/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
@@ -60,9 +60,12 @@ source install/setup.bash
 ### macOS / Linux without ROS
 
 ```bash
-xcode-select --install; brew install cmake eigen          # macOS only
+xcode-select --install; brew install cmake eigen pcl gtsam yaml-cpp   # macOS only
 python3 -m venv .venv && source .venv/bin/activate
 pip install . rosbags matplotlib
+# the C++ back-end tools (loop closing, multi-session): solid_close_loops, solid_align_sessions
+cmake -S cpp -B build -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON && cmake --build build -j
+export SOLID_TOOLS=$PWD/build
 python -c "import solid; print(solid.backend)"            # must print: cpp
 python python/tests/test_binding.py                       # must end with: PASSED
 ```
@@ -72,7 +75,7 @@ python python/tests/test_binding.py                       # must end with: PASSE
 The macOS tool reads the KITTI folder directly. For ROS, convert it to a bag (`/cloud` in the sensor frame, `/odom` with the ground-truth poses). The converter only needs `rosbags`, so run it with the Python from step 3 (or `pip install rosbags numpy` on the host):
 
 ```bash
-cd slam/mac
+cd mac
 python kitti_to_bag.py /path/to/sequences/00 ~/kitti00.bag --voxel 0.4     # ROS 1, about 0.75 GB
 python kitti_to_bag.py /path/to/sequences/00 ~/kitti00_ros2 --voxel 0.4    # ROS 2
 ```
@@ -89,15 +92,15 @@ ros2 launch solid_ros solid.launch.py config:=kitti save_dir:=$HOME/solid_result
 ros2 bag play kitti00_ros2 --clock
 
 # macOS / Linux without ROS
-cd slam/mac
-python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out $HOME/solid_results --gt-radius 5
+cd mac
+python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out $HOME/solid_results --gt-radius 5 --close-loops
 ```
 
 When the bag has finished, stop the launch with **Ctrl-C**: the node saves on exit.
 
 ## 6. Check the result
 
-- `$HOME/solid_results/loops.csv` and `keyframes.txt` must exist (plus `Scans/`, `SCDs/`, `SOLiDs/`, `singlesession_posegraph.g2o`).
+- `$HOME/solid_results/loops.csv` and `keyframes.txt` must exist (plus `Scans/`, `SCDs/`, `SOLiDs/`, `singlesession_posegraph.g2o`, and `optimized_poses.txt` from loop closing).
 - Expected on full KITTI 00: about **2712 keyframes and about 416 loop candidates**, all within 5 m of each other (the macOS tool prints `precision 1.000` with `--gt-radius 5`). Small differences between the KITTI folder, the ROS 1 and the ROS 2 runs come from the bag's voxel filter and message timing.
 - macOS: open `loops.png`. The red loop markers sit on the stretches KITTI 00 drives twice.
 - Report the numbers and the plot to the user.
@@ -107,16 +110,17 @@ When the bag has finished, stop the launch with **Ctrl-C**: the node saves on ex
 Cut KITTI 00 into two sessions and align them (ROS 1 or ROS 2 build):
 
 ```bash
-cd slam/mac
+cd mac
 python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
 python solid_loops.py --kitti /path/to/sequences/00 --config ../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
-roslaunch solid_multi_session align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
+roslaunch solid_ros align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
+# or without ROS: $SOLID_TOOLS/solid_align_sessions ../config/multi_session/lidar.yaml aligned sessions/00a sessions/00b
 ```
 
-The node prints, for 00b, the SOLiD candidates, the verified loops and `ALIGNED`. See [multi_session_slam/GUIDE.md](multi_session_slam/GUIDE.md).
+The node prints, for 00b, the SOLiD candidates, the verified loops and `ALIGNED`. See [docs/MULTI_SESSION.md](docs/MULTI_SESSION.md).
 
 ## Troubleshooting
 
-- **No loops at all**: the cloud is probably not in a z-up sensor frame (e.g. an IMU or camera optical frame), or the FOV in the config does not match the sensor. See [slam/config/GUIDE.md](slam/config/GUIDE.md#pitfalls).
+- **No loops at all**: the cloud is probably not in a z-up sensor frame (e.g. an IMU or camera optical frame), or the FOV in the config does not match the sensor. See [config/GUIDE.md](config/GUIDE.md#pitfalls).
 - **ROS 2 node saves nothing**: it saves on shutdown; stop it with Ctrl-C (SIGINT), not `kill -9`.
 - **macOS build fails**: check `brew list cmake eigen` and that the Python is not the Apple system Python 3.9.
