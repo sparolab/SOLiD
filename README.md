@@ -163,7 +163,7 @@ cd slam/common/mac && python solid_loops.py --kitti /path/to/kitti/sequences/00 
 
 Each run is saved as a session; sessions from different days are aligned into one map:
 
-<p align="center"><img src="fig/solid_multi_session.gif" alt="Multi-session SLAM with SOLiD. Left: two LiDAR sessions of KITTI 00, the second starting from a wrong pose. Right: three 4D radar sessions recorded on different days. Each session starts where its own odometry put it, then SOLiD aligns them into one map and the inter-session loops appear." width="95%" /></p>
+<p align="center"><img src="fig/solid_multi_session.gif" alt="Multi-session SLAM with SOLiD. Left: two LiDAR sessions of KITTI 00, the second starting from a wrong pose. Right: three 4D radar sessions recorded on different days. Each session starts where its own odometry put it. SOLiD aligns them, shown stacked at different heights so the inter-session loops are visible, and then the layers merge into one map." width="95%" /></p>
 
 ```bash
 roslaunch solid_ros align.launch sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned       # ROS 1
