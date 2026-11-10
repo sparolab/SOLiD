@@ -160,6 +160,14 @@ roslaunch solid_ros solid.launch config:=kitti cloud_topic:=/cloud odom_topic:=/
 cd slam/common/mac && python solid_loops.py --kitti /path/to/kitti/sequences/00 --config ../../config/kitti.yaml --out $HOME/solid_results --close-loops
 ```
 
+See the guides for all arguments, outputs and the odometry integrations: [Run](docs/GUIDE.md) · [Integrations](slam/README.md).
+
+______________________________________________________________________
+
+## :earth_asia: Applications
+
+### Multi-session SLAM
+
 Each run is saved as a session; sessions from different days are aligned into one map:
 
 <p align="center"><img src="fig/solid_multi_session_v2.gif" alt="Multi-session SLAM with SOLiD. Left: two LiDAR sessions of KITTI 00, the second starting from a wrong pose. Right: three 4D radar sessions recorded on different days. Each session starts where its own odometry put it. SOLiD aligns them, shown stacked at different heights so the inter-session loops are visible, and then the layers merge into one map." width="95%" /></p>
@@ -170,7 +178,15 @@ ros2 launch solid_multi_session align.launch.py sessions:="$HOME/day1 $HOME/day2
 tools/multi-session-slam/mac/align.sh $HOME/aligned $HOME/day1 $HOME/day2    # macOS
 ```
 
-See the guides for all arguments, outputs and the odometry integrations: [Run](docs/GUIDE.md) · [Multi-session SLAM](tools/multi-session-slam) · [Integrations](slam/README.md).
+See the [multi-session SLAM guide](tools/multi-session-slam) for all arguments, outputs, results and the configuration.
+
+### Multi-robot SLAM
+
+Robots share SOLiD descriptors to recognize where their maps overlap and merge them into one:
+
+<p align="center"><a href="https://github.com/sparolab/SKiD-SLAM"><img src="tools/multi-robot-slam/skid_slam_demo.gif" alt="SKiD-SLAM: distributed multi-robot LiDAR SLAM with SOLiD place recognition, on the Majang (left) and planetary analog (right) datasets" width="95%" /></a></p>
+
+See **[SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM)** (IEEE T-FR 2026): distributed multi-robot LiDAR SLAM built on SOLiD, with field deployments at planetary analog sites.
 
 ______________________________________________________________________
 
