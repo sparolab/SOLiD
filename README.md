@@ -17,6 +17,8 @@
   <a href="https://ieeexplore.ieee.org/abstract/document/10629042"><img src="https://img.shields.io/badge/Paper-IEEE%20RA--L-yellow" /></a>
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
+  <a href="#robot-run-with-your-agent"><img src="https://img.shields.io/badge/Claude%20Code-ready-D97757?logo=claude&logoColor=white" alt="Claude Code ready" /></a>
+  <a href="#robot-run-with-your-agent"><img src="https://img.shields.io/badge/Codex-ready-000000?logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHJlY3QgeD0iMS41IiB5PSIzIiB3aWR0aD0iMjEiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNNiA5bDMuNSAzTDYgMTUiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEyIDE1LjVoNiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=" alt="Codex ready" /></a>
   <a href="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml/badge.svg?branch=main" alt="C++ API" /></a>
   <a href="https://github.com/sparolab/SOLiD/actions/workflows/python.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/python.yml/badge.svg?branch=main" alt="Python API" /></a>
   <br />
