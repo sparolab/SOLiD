@@ -15,13 +15,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Build and test wheels
         run: pipx run cibuildwheel==4.3.5 --output-dir wheelhouse
         env:
-          MACOSX_DEPLOYMENT_TARGET: "14.0"
+          MACOSX_DEPLOYMENT_TARGET: "15.0"
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: wheels-${{ matrix.os }}
