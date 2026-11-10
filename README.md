@@ -66,7 +66,6 @@ ______________________________________________________________________
 
 ```bash
 git clone --recursive https://github.com/sparolab/SOLiD.git     # --recursive also gets the odometries in thirdparty/
-cd SOLiD
 ```
 
 Everything is built on one C++ library, [`cpp/`](cpp): the ROS 1 and ROS 2 packages ([`slam/common/ros1/`](slam/common/ros1), [`slam/common/ros2/`](slam/common/ros2)) and the macOS tools ([`slam/common/mac/`](slam/common/mac)) are thin wrappers around it, so they run the same code and give the same loops. Odometry integrations (FAST-LIO, KISS-ICP, GeoRIO, GaRLILEO, Leg-KILO) live per platform in [`slam/`](slam) with their own Docker images in [`docker/slam`](docker/slam).
