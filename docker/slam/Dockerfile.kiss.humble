@@ -1,6 +1,11 @@
 # KISS-ICP v1.3.0 (ROS 2, thirdparty/kiss-icp) + SOLiD.
 #   docker build -t solid-kiss:humble -f docker/slam/Dockerfile.kiss.humble .
-FROM solid:humble
+# Base: the published SOLiD image (or a local build: --build-arg BASE=solid:humble)
+ARG BASE=ghcr.io/sparolab/solid:humble
+FROM ${BASE}
+# The odometry sources come from this checkout (git submodule update --init --recursive).
+COPY thirdparty /ros2_ws/src/SOLiD/thirdparty
+RUN test -n "$(ls -A /ros2_ws/src/SOLiD/thirdparty/kiss-icp)" || (echo "thirdparty/ is empty: run git submodule update --init --recursive" && exit 1)
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git libtbb-dev python3-pip \
     && rm -rf /var/lib/apt/lists/*

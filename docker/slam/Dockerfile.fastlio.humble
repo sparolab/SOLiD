@@ -1,7 +1,11 @@
 # FAST-LIO (ROS 2 branch, thirdparty/FAST_LIO_ROS2) + livox_ros_driver2 + SOLiD.
-#   docker build -f docker/Dockerfile.humble -t solid:humble .
 #   docker build -t solid-fastlio:humble -f docker/slam/Dockerfile.fastlio.humble .
-FROM solid:humble
+# Base: the published SOLiD image (or a local build: --build-arg BASE=solid:humble)
+ARG BASE=ghcr.io/sparolab/solid:humble
+FROM ${BASE}
+# The odometry sources come from this checkout (git submodule update --init --recursive).
+COPY thirdparty /ros2_ws/src/SOLiD/thirdparty
+RUN test -n "$(ls -A /ros2_ws/src/SOLiD/thirdparty/FAST_LIO_ROS2)" && test -n "$(ls -A /ros2_ws/src/SOLiD/thirdparty/livox_ros_driver2)" || (echo "thirdparty/ is empty: run git submodule update --init --recursive" && exit 1)
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git cmake build-essential \
       libpcl-dev ros-humble-pcl-conversions \

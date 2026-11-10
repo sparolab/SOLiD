@@ -82,15 +82,15 @@ Everything is built on one C++ library, [`cpp/`](cpp): the ROS 1 and ROS 2 packa
 ```bash
 xhost +local:docker
 
-# ROS 1
-docker build -f docker/Dockerfile.noetic -t solid:noetic .
+# ROS 1: pull the prebuilt image (or build it: docker build -f docker/Dockerfile.noetic -t ghcr.io/sparolab/solid:noetic .)
+docker pull ghcr.io/sparolab/solid:noetic
 docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
-  -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data solid:noetic
+  -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data ghcr.io/sparolab/solid:noetic
 
-# ROS 2
-docker build -f docker/Dockerfile.humble -t solid:humble .
+# ROS 2: pull the prebuilt image (or build it: docker build -f docker/Dockerfile.humble -t ghcr.io/sparolab/solid:humble .)
+docker pull ghcr.io/sparolab/solid:humble
 docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
-  -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data solid:humble
+  -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/to/bags:/data ghcr.io/sparolab/solid:humble
 ```
 
 ### From source

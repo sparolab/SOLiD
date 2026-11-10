@@ -1,7 +1,12 @@
 # Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, thirdparty/Leg-KILO) + SOLiD.
 # Leg-KILO always opens its own viewer: without a display, run it under `xvfb-run -a`.
 #   docker build -t solid-legkilo:humble -f docker/slam/Dockerfile.legkilo.humble .
-FROM solid:humble
+# Base: the published SOLiD image (or a local build: --build-arg BASE=solid:humble)
+ARG BASE=ghcr.io/sparolab/solid:humble
+FROM ${BASE}
+# The odometry sources come from this checkout (git submodule update --init --recursive).
+COPY thirdparty /ros2_ws/src/SOLiD/thirdparty
+RUN test -n "$(ls -A /ros2_ws/src/SOLiD/thirdparty/Leg-KILO)" || (echo "thirdparty/ is empty: run git submodule update --init --recursive" && exit 1)
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git \
       libeigen3-dev libpcl-dev libgoogle-glog-dev libgflags-dev libyaml-cpp-dev \

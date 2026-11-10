@@ -1,6 +1,11 @@
 # GeoRIO (4D radar-inertial odometry, ROS 2, thirdparty/GeoRIO) + SOLiD.
 #   docker build -t solid-georio:humble -f docker/slam/Dockerfile.georio.humble .
-FROM solid:humble
+# Base: the published SOLiD image (or a local build: --build-arg BASE=solid:humble)
+ARG BASE=ghcr.io/sparolab/solid:humble
+FROM ${BASE}
+# The odometry sources come from this checkout (git submodule update --init --recursive).
+COPY thirdparty /ros2_ws/src/SOLiD/thirdparty
+RUN test -n "$(ls -A /ros2_ws/src/SOLiD/thirdparty/GeoRIO)" || (echo "thirdparty/ is empty: run git submodule update --init --recursive" && exit 1)
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git libomp-dev libpcl-dev \
       ros-humble-pcl-conversions ros-humble-pcl-ros ros-humble-rosbag2-storage-mcap \

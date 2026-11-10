@@ -31,8 +31,8 @@ Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop dete
 ### Docker
 
 ```bash
-docker build -f docker/Dockerfile.noetic -t solid:noetic .   # ROS 1
-docker build -f docker/Dockerfile.humble -t solid:humble .   # ROS 2
+docker pull ghcr.io/sparolab/solid:noetic    # ROS 1 (prebuilt; or: docker build -f docker/Dockerfile.noetic -t ghcr.io/sparolab/solid:noetic .)
+docker pull ghcr.io/sparolab/solid:humble    # ROS 2 (prebuilt; or: docker build -f docker/Dockerfile.humble -t ghcr.io/sparolab/solid:humble .)
 ```
 
 ### From source — ROS 1 (Noetic)

@@ -1,8 +1,12 @@
 # FAST-LIO (ROS 1, thirdparty/FAST_LIO) + SOLiD: Velodyne/Ouster LiDARs and the Livox Mid-360 humanoid (KILVO).
 #   git submodule update --init --recursive
-#   docker build -f docker/Dockerfile.noetic -t solid:noetic .
 #   docker build -f docker/slam/Dockerfile.fastlio.noetic -t solid-fastlio:noetic .
-FROM solid:noetic
+# Base: the published SOLiD image (or a local build: --build-arg BASE=solid:noetic)
+ARG BASE=ghcr.io/sparolab/solid:noetic
+FROM ${BASE}
+# The odometry sources come from this checkout (git submodule update --init --recursive).
+COPY thirdparty /catkin_ws/src/SOLiD/thirdparty
+RUN test -n "$(ls -A /catkin_ws/src/SOLiD/thirdparty/FAST_LIO)" && test -n "$(ls -A /catkin_ws/src/SOLiD/thirdparty/livox_ros_driver)" || (echo "thirdparty/ is empty: run git submodule update --init --recursive" && exit 1)
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git cmake build-essential \
     && rm -rf /var/lib/apt/lists/*
