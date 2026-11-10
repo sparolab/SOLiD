@@ -1,0 +1,32 @@
+# Python package: build from source and check the C++ binding against the pure-Python implementation.
+name: Python API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: py${{ matrix.python }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Eigen
+        run: |
+          if [ "$RUNNER_OS" = Linux ]; then sudo apt-get update && sudo apt-get install -y libeigen3-dev; else brew install eigen; fi
+      - run: pip install .
+      - name: C++ binding vs pure Python
+        run: |
+          cd python/tests
+          python -c "import solid; print(solid.__version__, solid.backend); assert solid.backend == 'cpp'"
+          python test_binding.py

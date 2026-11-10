@@ -1,0 +1,52 @@
+# C++ library: solid::core (golden regression + unit tests) on Ubuntu and macOS,
+# and solid::backend (GTSAM loop closing and multi-session) with the back-end tools.
+name: C++ API
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core:
+    name: core (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libeigen3-dev libpcl-dev libyaml-cpp-dev libgtest-dev
+      - name: Dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: brew install eigen yaml-cpp googletest
+      - name: Build
+        # Ubuntu also checks the PCL voxel path against the golden descriptors (verify_golden).
+        run: |
+          PCL=$([ "$RUNNER_OS" = Linux ] && echo ON || echo OFF)
+          cmake -S cpp -B build -DCMAKE_BUILD_TYPE=Release -DSOLID_USE_PCL=$PCL -DBUILD_SOLID_TESTS=ON
+          cmake --build build -j4
+      - name: Golden regression
+        if: runner.os == 'Linux'
+        run: ./build/verify_golden
+      - name: Unit tests
+        run: ctest --test-dir build --output-on-failure
+
+  backend:
+    name: backend (ROS 2 Humble image, GTSAM)
+    runs-on: ubuntu-latest
+    container: ros:humble-perception
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Dependencies
+        run: apt-get update && apt-get install -y --no-install-recommends libyaml-cpp-dev ros-humble-gtsam
+      - name: Build solid::backend and the tools
+        run: |
+          . /opt/ros/humble/setup.sh
+          cmake -S cpp -B build -DCMAKE_BUILD_TYPE=Release -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON
+          cmake --build build -j4
+          test -x build/solid_close_loops && test -x build/solid_align_sessions
