@@ -17,7 +17,6 @@
   <a href="https://ieeexplore.ieee.org/abstract/document/10629042"><img src="https://img.shields.io/badge/Paper-IEEE%20RA--L-yellow" /></a>
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
-  <br />
   <a href="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml/badge.svg?branch=main" alt="C++ API" /></a>
   <a href="https://github.com/sparolab/SOLiD/actions/workflows/python.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/python.yml/badge.svg?branch=main" alt="Python API" /></a>
   <br />
