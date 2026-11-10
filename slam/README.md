@@ -4,7 +4,9 @@
 slam/
 ├── common/            the SOLiD front-ends every platform uses
 │   ├── ros1/          ROS 1 package solid_ros: solid_node (loop closing), align_node (multi-session)
+│   │   └── launch/    run.launch (odometry + SOLiD), solid.launch (SOLiD only), align.launch (multi-session)
 │   ├── ros2/          ROS 2 package solid_ros: the same nodes
+│   │   └── launch/    run.launch.py, solid.launch.py, align.launch.py
 │   └── mac/           ROS-free tools: solid_loops.py (front-end), kitti_to_bag.py
 ├── config/            one YAML per sensor + multi_session/  (GUIDE.md)
 ├── lidar/             cars and UGVs with a LiDAR

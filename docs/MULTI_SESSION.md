@@ -70,20 +70,3 @@ roslaunch solid_ros align.launch sessions:="st_20240113 st_20231208 st_20231213"
 | `consensus` | `trans`, `rot_deg` | loops agree when their session transforms differ by less than this |
 | | `min_inliers` | a session with fewer agreeing loops is left unaligned |
 | `graph` | `odom_sigma_*`, `loop_sigma_*` | noise of odometry and loop edges |
-
-## Compared with LT-SLAM (Scan Context)
-
-The sessions also work with the original [LT-mapper](https://github.com/gisbi-kim/lt-mapper) LT-SLAM, which searches with Scan Context. [`tools/ltslam_baseline/run_ltslam.sh`](../tools/ltslam_baseline/run_ltslam.sh) runs it in Docker:
-
-```bash
-./tools/ltslam_baseline/run_ltslam.sh <sessions_dir> <central_session> <query_session> [out_dir]
-```
-
-On the KITTI 00 example (00a: scans 0-1999, 00b: 2000-4540):
-
-| Method | Inter-session candidates | Candidates within 5 m | 00b ATE (max) | Time |
-| --- | --- | --- | --- | --- |
-| LT-SLAM (Scan Context) | 542 | 74.5 % | 30.14 m (72.2 m) | about 2 min |
-| **SOLiD multi-session** | 350 (100 GICP-checked, 100 agree) | 100 % | **0.42 m (0.81 m)** | 12 s |
-
-LT-SLAM accepts the wrong Scan Context pairs through its ICP check, so 00b is pulled out of place.

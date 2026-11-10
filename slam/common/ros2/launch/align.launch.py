@@ -1,6 +1,6 @@
 """SOLiD multi-session alignment (ROS 2).
 
-    ros2 launch solid_multi_session align.launch.py sessions:="/data/00a /data/00b" save_dir:=/data/aligned
+    ros2 launch solid_ros align.launch.py sessions:="/data/00a /data/00b" save_dir:=/data/aligned
 """
 import os
 
