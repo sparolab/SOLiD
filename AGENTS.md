@@ -20,7 +20,7 @@ You are setting up and running SOLiD (a LiDAR / 4D radar place recognition descr
 ## 2. Get the code
 
 ```bash
-git clone https://github.com/sparolab/SOLiD.git
+git clone --recursive https://github.com/sparolab/SOLiD.git    # thirdparty/ holds the odometries
 cd SOLiD
 ```
 

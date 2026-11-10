@@ -1,7 +1,7 @@
 <launch>
   <!-- sessions: space-separated session folders; the first one is the central session -->
   <arg name="sessions" />
-  <arg name="config" default="$(find solid_ros)/../../config/multi_session/lidar.yaml" />
+  <arg name="config" default="$(dirname)/../../../config/multi_session/lidar.yaml" />
   <arg name="save_dir" default="" />
   <arg name="rviz" default="true" />
 
@@ -12,5 +12,5 @@
   </node>
 
   <node if="$(arg rviz)" pkg="rviz" type="rviz" name="solid_ms_rviz"
-        args="-d $(find solid_ros)/rviz/align.rviz" />
+        args="-d $(dirname)/../rviz/align.rviz" />
 </launch>

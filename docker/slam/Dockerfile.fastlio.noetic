@@ -1,7 +1,7 @@
-# FAST-LIO (ROS 1) + SOLiD. LiDAR-inertial odometry for spinning LiDARs and Livox
-# (e.g. Velodyne VLP-16 on Kimera-Multi, Livox Mid-360 on the KILVO humanoid).
-#   docker build -t solid:noetic -f docker/Dockerfile.noetic .
-#   docker build -t solid-fastlio:noetic -f docker/slam/Dockerfile.fastlio.noetic .
+# FAST-LIO (ROS 1, thirdparty/FAST_LIO) + SOLiD: Velodyne/Ouster LiDARs and the Livox Mid-360 humanoid (KILVO).
+#   git submodule update --init --recursive
+#   docker build -f docker/Dockerfile.noetic -t solid:noetic .
+#   docker build -f docker/slam/Dockerfile.fastlio.noetic -t solid-fastlio:noetic .
 FROM solid:noetic
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git cmake build-essential \
@@ -9,10 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git cmake build
 # FAST-LIO needs livox_ros_driver/CustomMsg, which needs the Livox SDK.
 RUN git clone --depth 1 https://github.com/Livox-SDK/Livox-SDK.git /opt/Livox-SDK && \
     cd /opt/Livox-SDK/build && cmake .. && make -j4 && make install
-RUN cd /catkin_ws/src && \
-    git clone --depth 1 https://github.com/Livox-SDK/livox_ros_driver.git && \
-    git clone https://github.com/hku-mars/FAST_LIO.git && cd FAST_LIO && \
-    git checkout 7cc4175 && git submodule update --init
+RUN cp -r /catkin_ws/src/SOLiD/thirdparty/livox_ros_driver /catkin_ws/src/ && \
+    cp -r /catkin_ws/src/SOLiD/thirdparty/FAST_LIO /catkin_ws/src/
 WORKDIR /catkin_ws
 RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release -j4
 CMD ["bash"]

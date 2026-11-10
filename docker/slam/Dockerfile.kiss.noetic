@@ -1,10 +1,10 @@
-# KISS-ICP v0.3.0 (the last release with ROS 1) + SOLiD.
+# KISS-ICP v0.3.0 (ROS 1, thirdparty/kiss-icp_ros1) + SOLiD.
 #   docker build -t solid-kiss:noetic -f docker/slam/Dockerfile.kiss.noetic .
 FROM solid:noetic
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends git cmake build-essential libtbb-dev \
     && rm -rf /var/lib/apt/lists/*
-RUN git clone --branch v0.3.0 --depth 1 https://github.com/PRBonn/kiss-icp.git /catkin_ws/src/kiss-icp
+RUN cp -r /catkin_ws/src/SOLiD/thirdparty/kiss-icp_ros1 /catkin_ws/src/kiss-icp
 WORKDIR /catkin_ws
 RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release -j4
 CMD ["bash"]

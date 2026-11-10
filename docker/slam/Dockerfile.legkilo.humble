@@ -1,4 +1,4 @@
-# Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, ROS 1 and ROS 2) + SOLiD.
+# Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, thirdparty/Leg-KILO) + SOLiD.
 # Leg-KILO always opens its own viewer: without a display, run it under `xvfb-run -a`.
 #   docker build -t solid-legkilo:humble -f docker/slam/Dockerfile.legkilo.humble .
 FROM solid:humble
@@ -13,7 +13,6 @@ RUN git clone --branch 2.2.0 --depth 1 https://github.com/ceres-solver/ceres-sol
     cmake -S /tmp/ceres -B /tmp/ceres/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF \
       -DBUILD_BENCHMARKS=OFF -DUSE_CUDA=OFF && \
     cmake --build /tmp/ceres/build -j4 && cmake --install /tmp/ceres/build && rm -rf /tmp/ceres
-RUN git clone --depth 1 https://github.com/ouguangjun/Leg-KILO.git /ros2_ws/src/Leg-KILO
 WORKDIR /ros2_ws
-RUN . /opt/ros/humble/setup.sh && colcon build --base-paths src/Leg-KILO --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+RUN . /opt/ros/humble/setup.sh && colcon build --base-paths src/SOLiD/thirdparty/Leg-KILO --parallel-workers 2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 CMD ["bash"]

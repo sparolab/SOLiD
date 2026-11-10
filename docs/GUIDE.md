@@ -4,6 +4,15 @@ Everything below runs the same C++ library ([`cpp/`](../cpp)): the ROS 1 and ROS
 
 ## ROS 1 / ROS 2: online loop closing
 
+With one of the bundled odometries (git submodules in [`thirdparty/`](../thirdparty)):
+
+```bash
+roslaunch solid_ros run.launch odometry:=fast_lio save_dir:=$HOME/solid_results       # fast_lio, kiss_icp, legkilo, fast_lio_mid360
+ros2 launch solid_ros run.launch.py odometry:=georio save_dir:=$HOME/solid_results    # + georio, garlileo
+```
+
+With any other odometry, start `solid_node` on its output:
+
 `solid_node` takes a point cloud and the odometry that goes with it, from any LiDAR or radar odometry. Per keyframe it builds a SOLiD descriptor, finds loop candidates, checks them with GICP between keyframe submaps and adds the accepted loops to an iSAM2 pose graph, online.
 
 ```bash
@@ -31,7 +40,7 @@ ros2 launch solid_ros solid.launch.py config:=kitti cloud_topic:=/cloud odom_top
 
 With `loop_closing.enable: false` in the config, the node only proposes candidates (all of them, `verified: false`) for your own back-end.
 
-Online results (KITTI 00 played at 2x, KISS-ICP odometry): ATE 4.02 m → 1.15 m on both ROS 1 and ROS 2.
+Live results (odometry and `solid_node` running together on the played bag): KITTI 00 with KISS-ICP 3.70 → 1.13 m, SNAIL-Radar with GeoRIO 0.47 → 0.19 m, GaRLILEO BridgeLoop 0.37 → 0.30 m; all runs in the [configuration guide](../slam/config/GUIDE.md#loop-closing-drift-before-and-after).
 
 ### With an odometry
 

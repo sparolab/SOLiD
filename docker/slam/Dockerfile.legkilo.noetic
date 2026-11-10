@@ -1,4 +1,4 @@
-# Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, ROS 1 and ROS 2) + SOLiD.
+# Leg-KILO (kinematic-inertial-LiDAR odometry for legged robots, thirdparty/Leg-KILO) + SOLiD.
 # Leg-KILO always opens its own viewer: without a display, run it under `xvfb-run -a`.
 #   docker build -t solid-legkilo:noetic -f docker/slam/Dockerfile.legkilo.noetic .
 FROM solid:noetic
@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git \
       libboost-filesystem-dev libboost-system-dev libtbb-dev liblz4-dev libceres-dev libglm-dev libglfw3-dev \
       xvfb libgl1-mesa-dri \
     && rm -rf /var/lib/apt/lists/*
-RUN git clone --depth 1 https://github.com/ouguangjun/Leg-KILO.git /catkin_ws/src/Leg-KILO
+RUN cp -r /catkin_ws/src/SOLiD/thirdparty/Leg-KILO /catkin_ws/src/Leg-KILO
 WORKDIR /catkin_ws
 RUN . /opt/ros/noetic/setup.sh && catkin_make -DCMAKE_BUILD_TYPE=Release -j4
 CMD ["bash"]

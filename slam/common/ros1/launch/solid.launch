@@ -6,7 +6,7 @@
   <arg name="save_dir" default="" />
   <arg name="rviz" default="true" />
 
-  <arg name="config_dir" value="$(find solid_ros)/../../config" />
+  <arg name="config_dir" value="$(dirname)/../../../config" />
 
   <node pkg="solid_ros" type="solid_node" name="solid" output="screen" required="true">
     <param name="config" value="$(arg config_dir)/$(arg config).yaml"
@@ -18,5 +18,5 @@
   </node>
 
   <node if="$(arg rviz)" pkg="rviz" type="rviz" name="solid_rviz"
-        args="-d $(find solid_ros)/rviz/solid.rviz" />
+        args="-d $(dirname)/../rviz/solid.rviz" />
 </launch>

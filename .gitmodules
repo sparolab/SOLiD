@@ -1,0 +1,30 @@
+[submodule "thirdparty/FAST_LIO"]
+	path = thirdparty/FAST_LIO
+	url = https://github.com/hku-mars/FAST_LIO.git
+[submodule "thirdparty/FAST_LIO_ROS2"]
+	path = thirdparty/FAST_LIO_ROS2
+	url = https://github.com/hku-mars/FAST_LIO.git
+[submodule "thirdparty/kiss-icp_ros1"]
+	path = thirdparty/kiss-icp_ros1
+	url = https://github.com/PRBonn/kiss-icp.git
+[submodule "thirdparty/kiss-icp"]
+	path = thirdparty/kiss-icp
+	url = https://github.com/PRBonn/kiss-icp.git
+[submodule "thirdparty/GeoRIO"]
+	path = thirdparty/GeoRIO
+	url = https://github.com/wooseongY/GeoRIO.git
+[submodule "thirdparty/GaRLILEO"]
+	path = thirdparty/GaRLILEO
+	url = https://github.com/ChiyunNoh/GaRLILEO.git
+[submodule "thirdparty/SPOT_ego_Velocity"]
+	path = thirdparty/SPOT_ego_Velocity
+	url = https://github.com/SangwooJung98/SPOT_ego_Velocity.git
+[submodule "thirdparty/Leg-KILO"]
+	path = thirdparty/Leg-KILO
+	url = https://github.com/ouguangjun/Leg-KILO.git
+[submodule "thirdparty/livox_ros_driver"]
+	path = thirdparty/livox_ros_driver
+	url = https://github.com/Livox-SDK/livox_ros_driver.git
+[submodule "thirdparty/livox_ros_driver2"]
+	path = thirdparty/livox_ros_driver2
+	url = https://github.com/Livox-SDK/livox_ros_driver2.git

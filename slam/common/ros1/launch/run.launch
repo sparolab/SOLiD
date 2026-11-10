@@ -1,0 +1,21 @@
+<launch>
+  <!-- One entry point: an odometry + SOLiD (loop candidates, online loop closing).
+       odometry: fast_lio | kiss_icp | legkilo | fast_lio_mid360
+       (GeoRIO and GaRLILEO are ROS 2 only.) Build the odometry first: thirdparty/README.md. -->
+  <arg name="odometry" default="fast_lio" />
+  <arg name="save_dir" default="" />
+  <arg name="P" value="$(dirname)/../../.." />
+
+  <include if="$(eval odometry == 'fast_lio')" file="$(arg P)/lidar/ros1/fastlio_solid.launch">
+    <arg name="save_dir" value="$(arg save_dir)" />
+  </include>
+  <include if="$(eval odometry == 'kiss_icp')" file="$(arg P)/lidar/ros1/kiss_solid.launch">
+    <arg name="save_dir" value="$(arg save_dir)" />
+  </include>
+  <include if="$(eval odometry == 'legkilo')" file="$(arg P)/legged/ros1/legkilo_solid.launch">
+    <arg name="save_dir" value="$(arg save_dir)" />
+  </include>
+  <include if="$(eval odometry == 'fast_lio_mid360')" file="$(arg P)/humanoid/ros1/fastlio_mid360_solid.launch">
+    <arg name="save_dir" value="$(arg save_dir)" />
+  </include>
+</launch>

@@ -13,14 +13,21 @@ slam/
 └── humanoid/          humanoids
 ```
 
-Each platform folder has the same layout: `ros1/` and `ros2/` (launch files that run an odometry together with `solid_node`), `mac/` (scripts that run SOLiD offline on a bag where that odometry was recorded) and `config/` (the SOLiD config for that setup). Every setup closes loops online (`loop_closing.enable`). Docker images: [`docker/slam`](../docker/slam).
+The odometries are git submodules in [`thirdparty/`](../thirdparty) (pinned to the tested commits; `git clone --recursive`). One entry point picks the odometry and runs it live with SOLiD:
 
-| Platform | Odometry | ROS 1 | ROS 2 | macOS | Tested on | Result |
+```bash
+roslaunch solid_ros run.launch odometry:=fast_lio save_dir:=/out           # ROS 1: fast_lio, kiss_icp, legkilo, fast_lio_mid360
+ros2 launch solid_ros run.launch.py odometry:=georio save_dir:=/out        # ROS 2: + georio, garlileo
+```
+
+Each platform folder has the same layout: `ros1/` and `ros2/` (launch files that run an odometry together with `solid_node`), `mac/` (scripts that run SOLiD offline on a bag where that odometry was recorded) and `config/` (the SOLiD config for that setup). Every setup closes loops online (`loop_closing.enable`): the odometry runs live and `solid_node` optimizes on its output as it arrives. The results below are from such live runs (details in the [configuration guide](config/GUIDE.md#loop-closing-drift-before-and-after)). Docker images: [`docker/slam`](../docker/slam).
+
+| Platform | Odometry | ROS 1 | ROS 2 | macOS | Tested on | Result (live) |
 | --- | --- | --- | --- | --- | --- | --- |
-| `lidar` | [KISS-ICP](https://github.com/PRBonn/kiss-icp) | `kiss_solid.launch` (`v0.3.0`) | `kiss_solid.launch.py` | `kiss_icp.sh` | KITTI 00, Kimera-Multi | ATE 3.93 → 1.13 m |
-| `lidar` | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) | `fastlio_solid.launch` | `fastlio_solid.launch.py` | `fast_lio.sh` | Kimera-Multi `sparkal1` (VLP-16) | candidates 0.76 precision |
+| `lidar` | [KISS-ICP](https://github.com/PRBonn/kiss-icp) | `kiss_solid.launch` (`v0.3.0`) | `kiss_solid.launch.py` | `kiss_icp.sh` | KITTI 00, Kimera-Multi | ATE 3.70 → 1.13 m |
+| `lidar` | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) | `fastlio_solid.launch` | `fastlio_solid.launch.py` | `fast_lio.sh` | Kimera-Multi `sparkal1` (VLP-16) | ATE 1.30 → 1.29 m |
 | `radar` | [GeoRIO](https://github.com/wooseongY/GeoRIO) | – | `georio_solid.launch.py` | `georio.sh` | SNAIL-Radar (ARS548) | ATE 0.47 → 0.19 m |
-| `legged` | [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) | – | `garlileo_solid.launch.py` | `garlileo.sh` | GaRLILEO (Spot, TI IWR1843) | ATE 0.42 → 0.30 m |
+| `legged` | [GaRLILEO](https://github.com/ChiyunNoh/GaRLILEO) | – | `garlileo_solid.launch.py` | `garlileo.sh` | GaRLILEO (Spot, TI IWR1843) | ATE 0.37 → 0.30 m |
 | `legged` | [Leg-KILO](https://github.com/ouguangjun/Leg-KILO) | `legkilo_solid.launch` | `legkilo_solid.launch.py` | `legkilo.sh` | Leg-KILO `corridor` (Go1, VLP-16) | ATE 0.22 m (already accurate) |
 | `humanoid` | [FAST-LIO](https://github.com/hku-mars/FAST_LIO) on a Livox Mid-360 | `fastlio_mid360_solid.launch` | `fastlio_mid360_solid.launch.py` | `fast_lio_mid360.sh` | [KILVO](https://github.com/JixinGao/KILVO) (Unitree G1) | 19 loops kept, 9 rejected |
 
@@ -32,7 +39,7 @@ docker build -f docker/Dockerfile.humble -t solid:humble .
 docker build -f docker/slam/Dockerfile.georio.humble -t solid-georio:humble .
 
 # online: odometry + SOLiD
-ros2 launch slam/radar/ros2/georio_solid.launch.py save_dir:=/out
+ros2 launch solid_ros run.launch.py odometry:=georio save_dir:=/out
 ros2 bag play <SNAIL-Radar ROS 2 bag>
 
 # offline on macOS: record the odometry topics once, then

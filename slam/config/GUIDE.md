@@ -42,17 +42,17 @@ Copy the closest one for a new sensor and pass its path as `config`.
 
 ## Loop closing: drift before and after
 
-ATE after a best rigid fit to the ground truth, so only the drift counts:
+ATE after a best rigid fit to the ground truth, so only the drift counts. Every row is a live run: the odometry and `solid_node` run together on the played bag (`run.launch` / `run.launch.py`), and the loop-closed column is the pose graph `solid_node` saved.
 
-| Data | Odometry | Odometry only | With SOLiD loop closing |
-| --- | --- | --- | --- |
-| KITTI 00 (HDL-64) | KISS-ICP | 3.93 m (max 8.24) | **1.13 m** (max 2.52) |
-| KITTI 00, ROS 1 / ROS 2 node online (2x) | KISS-ICP | 4.02 m | **1.15 m** |
-| SNAIL-Radar 20240113/data1 (ARS548) | GeoRIO | 0.47 m (max 1.40) | **0.19 m** (max 0.43) |
-| GaRLILEO BridgeLoop (TI IWR1843, Spot) | GaRLILEO | 0.42 m (max 0.80) | **0.30 m** (max 0.75) |
-| Leg-KILO corridor (VLP-16, Go1) | Leg-KILO | 0.22 m (max 0.42) | 0.23 m (max 0.42): little drift to remove, 3 loops kept |
+| Data | Odometry (ROS) | Odometry only | With SOLiD loop closing | Loops |
+| --- | --- | --- | --- | --- |
+| KITTI 00 (HDL-64) | KISS-ICP (2) | 3.70 m | **1.13 m** | 418 |
+| Kimera-Multi sparkal1 (VLP-16) | FAST-LIO (1) | 1.30 m (max 3.62) | 1.29 m (max 3.61): FAST-LIO drifts little here | 15 |
+| SNAIL-Radar 20240113/data1 (ARS548) | GeoRIO (2) | 0.47 m | **0.19 m** | 132 |
+| GaRLILEO BridgeLoop (TI IWR1843, Spot) | GaRLILEO (2) | 0.37 m | **0.30 m** | 113 |
+| Leg-KILO corridor (VLP-16, Go1) | Leg-KILO (2) | 0.22 m | 0.22 m: little drift to remove | 3 |
 
-On the [KILVO](https://github.com/JixinGao/KILVO) humanoid (Unitree G1, Livox Mid-360, FAST-LIO; no ground truth), the GICP check kept all 19 candidates that FAST-LIO also puts within 3 m and rejected all 9 that it does not.
+On the [KILVO](https://github.com/JixinGao/KILVO) humanoid (Unitree G1, Livox Mid-360, FAST-LIO via `run.launch odometry:=fast_lio_mid360`; no ground truth), 143 keyframes gave 28 candidates; the GICP check kept 19, all of them places FAST-LIO also puts within 3 m, and rejected the other 9.
 
 ## Tuning `min_score`
 

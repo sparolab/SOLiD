@@ -19,10 +19,14 @@ RUN source /opt/ros/humble/setup.bash && \
       -DSOLID_USE_PCL=OFF -DSOLID_BUILD_BACKEND=ON -DSOLID_BUILD_EXAMPLES=OFF -DBUILD_SOLID_VERIFY=OFF && \
     cmake --build /tmp/solid_build -j4 && cmake --install /tmp/solid_build && rm -rf /tmp/solid_build
 # 2. GaRLILEO + SPOT_ego_Velocity (leg velocity)
+# GaRLILEO + SPOT_ego_Velocity from thirdparty/ (git submodule update --init --recursive)
 RUN git config --global --add safe.directory '*' && \
-    git clone --recursive https://github.com/ChiyunNoh/GaRLILEO.git /root/ros2_ws/src/GaRLILEO && \
-    git clone https://github.com/SangwooJung98/SPOT_ego_Velocity.git /root/ros2_ws/src/SPOT_ego_Velocity && \
-    cd /root/ros2_ws/src/GaRLILEO && bash build_thirdparty.sh
+    cp -r /root/ros2_ws/src/SOLiD/thirdparty/GaRLILEO /root/ros2_ws/src/GaRLILEO && \
+    cp -r /root/ros2_ws/src/SOLiD/thirdparty/SPOT_ego_Velocity /root/ros2_ws/src/SPOT_ego_Velocity && \
+    cd /root/ros2_ws/src/GaRLILEO && \
+    # the submodules are already in the build context (no .git there): skip the scripts' `git submodule update`
+    sed -i '/git submodule update/,/^fi$/d' build_thirdparty.sh thirdparty/ctraj/build_thirdparty.sh && \
+    bash build_thirdparty.sh
 # magic_enum >= 0.9.6 moved the bitwise operators to their own header.
 RUN sed -i 's#^\#include <magic_enum.hpp>#\#include <magic_enum.hpp>\n\#if __has_include(<magic_enum/magic_enum_bitwise.hpp>)\n\#include <magic_enum/magic_enum_bitwise.hpp>\n\#endif#' \
       /root/ros2_ws/src/GaRLILEO/include/util/enum_cast.hpp

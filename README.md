@@ -66,7 +66,7 @@ ______________________________________________________________________
 ## :package: Installation
 
 ```bash
-git clone https://github.com/sparolab/SOLiD.git
+git clone --recursive https://github.com/sparolab/SOLiD.git     # --recursive also gets the odometries in thirdparty/
 cd SOLiD
 ```
 
@@ -97,7 +97,8 @@ docker run -it --rm --net=host -e DISPLAY=$DISPLAY \
 sudo add-apt-repository ppa:borglab/gtsam-release-4.0
 sudo apt install libeigen3-dev libyaml-cpp-dev libgtsam-dev libgtsam-unstable-dev
 
-# clone into ~/catkin_ws/src
+# clone into ~/catkin_ws/src; to add an odometry, link it next to SOLiD (see thirdparty/README.md):
+# ln -s ~/catkin_ws/src/SOLiD/thirdparty/FAST_LIO ~/catkin_ws/src/
 cd ~/catkin_ws && catkin_make -DCMAKE_BUILD_TYPE=Release
 ```
 
@@ -110,6 +111,7 @@ cd ~/catkin_ws && catkin_make -DCMAKE_BUILD_TYPE=Release
 sudo apt install libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
 
 # clone into ~/ros2_ws/src
+# add an odometry with its folder, e.g. src/SOLiD/thirdparty/GeoRIO (see thirdparty/README.md)
 cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/common/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
@@ -141,14 +143,19 @@ ______________________________________________________________________
 
 ## :rocket: Run
 
-```bash
-# ROS 1: loop candidates + online loop closing
-roslaunch solid_ros solid.launch config:=kitti save_dir:=$HOME/solid_results
-rosbag play --clock kitti00.bag
+Pick an odometry; it runs live and SOLiD closes loops on its output online:
 
-# ROS 2
-ros2 launch solid_ros solid.launch.py config:=kitti save_dir:=$HOME/solid_results
-ros2 bag play kitti00_ros2 --clock
+```bash
+# ROS 1: odometry = fast_lio | kiss_icp | legkilo | fast_lio_mid360
+roslaunch solid_ros run.launch odometry:=fast_lio save_dir:=$HOME/solid_results
+rosbag play --clock <bag>
+
+# ROS 2: odometry = fast_lio | kiss_icp | georio | garlileo | legkilo | fast_lio_mid360
+ros2 launch solid_ros run.launch.py odometry:=georio save_dir:=$HOME/solid_results
+ros2 bag play <bag> --clock
+
+# Your own odometry: give SOLiD its cloud and odometry topics
+roslaunch solid_ros solid.launch config:=kitti cloud_topic:=/cloud odom_topic:=/odom
 
 # macOS: the same front-end and back-end, from a bag or a KITTI folder
 cd slam/common/mac && python solid_loops.py --kitti /path/to/kitti/sequences/00 --config ../../config/kitti.yaml --out $HOME/solid_results --close-loops

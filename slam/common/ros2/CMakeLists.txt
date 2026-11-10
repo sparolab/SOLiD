@@ -50,5 +50,10 @@ if(pcl_conversions_FOUND)
 endif()
 install(DIRECTORY launch rviz DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY ${SOLID_CONFIG_DIR}/ DESTINATION share/${PROJECT_NAME}/config)
+# Platform launch files (odometry + SOLiD), used by run.launch.py; their configs sit next to them.
+foreach(_platform lidar radar legged humanoid)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../${_platform} DESTINATION share/${PROJECT_NAME}/platforms
+          USE_SOURCE_PERMISSIONS)
+endforeach()
 
 ament_package()
