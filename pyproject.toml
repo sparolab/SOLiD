@@ -3,7 +3,7 @@ requires = ["scikit-build-core>=0.8", "pybind11>=2.10"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "solid"
+name = "solid-descriptor"
 version = "2.0.0"
 description = "SOLiD: Spatially Organized and Lightweight Global Descriptor (C++ core + pure-Python)"
 readme = "README.md"

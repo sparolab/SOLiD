@@ -12,19 +12,14 @@ Both expose the same names as the C++ core: `Config`, `Descriptor`, `Candidate`,
 
 ## Install
 
-The compiled extension pulls the C++ core from the sibling `../cpp`, so install
-from the repository tree (not from a copied/isolated build):
-
 ```bash
-# from the SOLiD repo root
-pip install -e python                    # editable (recommended)
-# or
-pip install --no-build-isolation ./python
+pip install solid-descriptor                              # from PyPI (wheels: Linux x86_64/aarch64, macOS arm64; Python 3.10-3.13)
+pip install git+https://github.com/sparolab/SOLiD.git     # or the latest main
+pip install .                                             # or from a clone (repository root)
 ```
 
-The extension is built **PCL-free** (internal voxel) and statically links the
-C++ runtime, so it imports under any Python — including Conda envs such as the
-GS-ICP-SLAM environment.
+The package is installed as `solid-descriptor` and imported as `solid`. The extension is built
+**PCL-free** (internal voxel); building from source needs a C++17 compiler and Eigen.
 
 ## Usage
 
