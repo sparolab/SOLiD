@@ -9,7 +9,7 @@ One YAML file per sensor, read at runtime by the ROS 1 node, the ROS 2 node and 
 | `vlp16.yaml` | Velodyne VLP-16 |
 | `livox_mid360.yaml` | Livox Mid-360 (vertical FOV -7 ~ +52 deg) |
 | `radar_4d.yaml` | 4D imaging radar (sparse: submaps of 20 scans) |
-| `multi_session/lidar.yaml`, `multi_session/radar_4d.yaml` | multi-session alignment |
+| [`tools/multi-session-slam/config/`](../../tools/multi-session-slam/config) | multi-session alignment (`lidar.yaml`, `radar_4d.yaml`) |
 
 Platform-specific copies (odometry frames, extrinsics) are next to the launch files in [`slam/<platform>/config`](..).
 

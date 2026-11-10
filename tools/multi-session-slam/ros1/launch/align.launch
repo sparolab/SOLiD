@@ -1,11 +1,11 @@
 <launch>
   <!-- sessions: space-separated session folders; the first one is the central session -->
   <arg name="sessions" />
-  <arg name="config" default="$(dirname)/../../../config/multi_session/lidar.yaml" />
+  <arg name="config" default="$(dirname)/../../config/lidar.yaml" />
   <arg name="save_dir" default="" />
   <arg name="rviz" default="true" />
 
-  <node pkg="solid_ros" type="align_node" name="solid_multi_session" output="screen">
+  <node pkg="solid_multi_session" type="align_node" name="solid_multi_session" output="screen">
     <param name="sessions" value="$(arg sessions)" />
     <param name="config" value="$(arg config)" />
     <param name="save_dir" value="$(arg save_dir)" />

@@ -7,8 +7,8 @@ FROM ${BASE}
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 # solid::backend links GaRLILEO's own PCL build; GTSAM comes from the ROS apt repo.
-# (pcl_conversions is left out so apt does not pull a second PCL: align_node is skipped here;
-#  align saved sessions with the solid:humble image.)
+# (only solid_ros is built here; for multi-session (tools/multi-session-slam, needs pcl_conversions)
+#  use the solid:humble image.)
 RUN apt-get update && apt-get install -y --no-install-recommends libyaml-cpp-dev mpi-default-dev \
       ros-humble-message-filters ros-humble-gtsam \
     && rm -rf /var/lib/apt/lists/*

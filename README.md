@@ -32,7 +32,8 @@ A robot recognizes where it has been before, even when its sensor sees only a na
 - :zap: **Lightweight**: about 1.5 ms per keyframe on a CPU, with no GPU and no training.
 - :satellite: **Any range sensor**: spinning or solid-state LiDAR, and sparse 4D radar through submaps of consecutive scans.
 - :repeat: **Online loop closing**: candidates are checked with GICP and added to an iSAM2 pose graph while the robot runs.
-- :world_map: **Multi-session SLAM**: sessions from different days are aligned into one map ([guide](docs/MULTI_SESSION.md)).
+- :world_map: **Multi-session SLAM**: sessions from different days are aligned into one map ([guide](tools/multi-session-slam)).
+- :busts_in_silhouette: **Multi-robot SLAM**: robots share SOLiD descriptors to merge their maps, in [SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM) ([more](tools/multi-robot-slam)).
 
 <p align="center">
   <picture>
@@ -110,7 +111,7 @@ sudo apt install libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
 
 # clone into ~/ros2_ws/src
 # add an odometry with its folder, e.g. src/SOLiD/thirdparty/GeoRIO (see thirdparty/README.md)
-cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/common/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/common/ros2 src/SOLiD/tools/multi-session-slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 </details>
@@ -164,12 +165,12 @@ Each run is saved as a session; sessions from different days are aligned into on
 <p align="center"><img src="fig/solid_multi_session_v2.gif" alt="Multi-session SLAM with SOLiD. Left: two LiDAR sessions of KITTI 00, the second starting from a wrong pose. Right: three 4D radar sessions recorded on different days. Each session starts where its own odometry put it. SOLiD aligns them, shown stacked at different heights so the inter-session loops are visible, and then the layers merge into one map." width="95%" /></p>
 
 ```bash
-roslaunch solid_ros align.launch sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned       # ROS 1
-ros2 launch solid_ros align.launch.py sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned  # ROS 2
-solid_align_sessions slam/config/multi_session/lidar.yaml $HOME/aligned $HOME/day1 $HOME/day2    # macOS
+roslaunch solid_multi_session align.launch sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned       # ROS 1
+ros2 launch solid_multi_session align.launch.py sessions:="$HOME/day1 $HOME/day2" save_dir:=$HOME/aligned  # ROS 2
+tools/multi-session-slam/mac/align.sh $HOME/aligned $HOME/day1 $HOME/day2    # macOS
 ```
 
-See the guides for all arguments, outputs and the odometry integrations: [Run](docs/GUIDE.md) · [Multi-session SLAM](docs/MULTI_SESSION.md) · [Integrations](slam/README.md).
+See the guides for all arguments, outputs and the odometry integrations: [Run](docs/GUIDE.md) · [Multi-session SLAM](tools/multi-session-slam) · [Integrations](slam/README.md).
 
 ______________________________________________________________________
 
@@ -187,7 +188,7 @@ ______________________________________________________________________
 
 ## :gear: Configuration
 
-All parameters are read at runtime from one YAML file per sensor (`kitti`, `ouster64`, `vlp16`, `livox_mid360`, `radar_4d`): descriptor, keyframes, submaps, loop candidates and loop closing. See the configuration guides: [Sensors and loop closing](slam/config/GUIDE.md) · [Multi-session SLAM](docs/MULTI_SESSION.md#configuration).
+All parameters are read at runtime from one YAML file per sensor (`kitti`, `ouster64`, `vlp16`, `livox_mid360`, `radar_4d`): descriptor, keyframes, submaps, loop candidates and loop closing. See the configuration guides: [Sensors and loop closing](slam/config/GUIDE.md) · [Multi-session SLAM](tools/multi-session-slam#configuration).
 
 ______________________________________________________________________
 

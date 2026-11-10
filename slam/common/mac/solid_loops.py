@@ -18,7 +18,7 @@ config/*.yaml files as the ROS nodes.
 
 Outputs in --out: an LT-mapper session (Scans/, SCDs/, SOLiDs/,
 singlesession_posegraph.g2o, odom_poses.txt, times.txt), keyframes.txt (TUM),
-loops.csv and loops.png. See docs/MULTI_SESSION.md for aligning sessions.
+loops.csv and loops.png. See tools/multi-session-slam for aligning sessions.
 """
 from __future__ import annotations
 

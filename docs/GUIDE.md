@@ -83,7 +83,7 @@ The C++ tools also run on their own: `solid_close_loops <session> <config.yaml>`
 
 ## Output: a session
 
-With `save_dir` (ROS) or `--out` (macOS), every run is saved as an [LT-mapper](https://github.com/gisbi-kim/lt-mapper) session, ready for [multi-session SLAM](MULTI_SESSION.md):
+With `save_dir` (ROS) or `--out` (macOS), every run is saved as an [LT-mapper](https://github.com/gisbi-kim/lt-mapper) session, ready for [multi-session SLAM](../tools/multi-session-slam):
 
 ```
 <session>/

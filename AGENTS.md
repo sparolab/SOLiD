@@ -24,7 +24,7 @@ git clone --recursive https://github.com/sparolab/SOLiD.git    # thirdparty/ hol
 cd SOLiD
 ```
 
-Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop detection, loop closing, multi-session). `slam/common/ros1` and `slam/common/ros2` are the ROS packages (`solid_ros`: `solid_node`, `align_node`), `slam/common/mac` the ROS-free tools, `slam/config` one YAML per sensor, and `slam/{lidar,radar,legged,humanoid}` the odometry integrations (each with `ros1/`, `ros2/`, `mac/`, `config/`).
+Layout: `cpp/` is the SOLiD library that everything links (descriptor, loop detection, loop closing, multi-session). `slam/common/ros1` and `slam/common/ros2` are the ROS packages (`solid_ros`: `solid_node`), `slam/common/mac` the ROS-free tools, `slam/config` one YAML per sensor, and `slam/{lidar,radar,legged,humanoid}` the odometry integrations (each with `ros1/`, `ros2/`, `mac/`, `config/`). `tools/multi-session-slam` is multi-session SLAM (package `solid_multi_session`, same `ros1/ros2/mac/config` layout).
 
 ## 3. Build
 
@@ -51,7 +51,7 @@ source devel/setup.bash
 sudo apt install -y libeigen3-dev libyaml-cpp-dev ros-humble-gtsam
 mkdir -p ~/ros2_ws/src && ln -s "$PWD" ~/ros2_ws/src/SOLiD
 cd ~/ros2_ws && source /opt/ros/humble/setup.bash
-colcon build --base-paths src/SOLiD/slam/common/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
+colcon build --base-paths src/SOLiD/slam/common/ros2 src/SOLiD/tools/multi-session-slam/ros2 --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
@@ -115,11 +115,11 @@ Cut KITTI 00 into two sessions and align them (ROS 1 or ROS 2 build):
 cd slam/common/mac
 python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00a --range 0:2000 --rebase
 python solid_loops.py --kitti /path/to/sequences/00 --config ../../config/kitti.yaml --out sessions/00b --range 2000:4541 --rebase
-roslaunch solid_ros align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
-# or without ROS: $SOLID_TOOLS/solid_align_sessions ../../config/multi_session/lidar.yaml aligned sessions/00a sessions/00b
+roslaunch solid_multi_session align.launch sessions:="$PWD/sessions/00a $PWD/sessions/00b" save_dir:=$PWD/aligned
+# or without ROS: ../../../tools/multi-session-slam/mac/align.sh aligned sessions/00a sessions/00b
 ```
 
-The node prints, for 00b, the SOLiD candidates, the verified loops and `ALIGNED`. See [docs/MULTI_SESSION.md](docs/MULTI_SESSION.md).
+The node prints, for 00b, the SOLiD candidates, the verified loops and `ALIGNED`. See [tools/multi-session-slam](tools/multi-session-slam).
 
 ## Troubleshooting
 

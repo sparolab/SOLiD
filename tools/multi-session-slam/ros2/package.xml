@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>solid_multi_session</name>
+  <version>2.0.0</version>
+  <description>SOLiD multi-session SLAM for ROS 2: aligns saved sessions into one map (thin wrapper around the SOLiD library).</description>
+  <maintainer email="hg.kim@inha.edu">Hogyun Kim</maintainer>
+  <license>GPL-3.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>eigen</depend>
+  <depend>yaml-cpp</depend>
+  <depend>pcl_conversions</depend>
+  <depend>libpcl-all-dev</depend>
+  <depend>gtsam</depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

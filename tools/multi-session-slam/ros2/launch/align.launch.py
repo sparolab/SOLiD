@@ -1,6 +1,6 @@
 """SOLiD multi-session alignment (ROS 2).
 
-    ros2 launch solid_ros align.launch.py sessions:="/data/00a /data/00b" save_dir:=/data/aligned
+    ros2 launch solid_multi_session align.launch.py sessions:="/data/00a /data/00b" save_dir:=/data/aligned
 """
 import os
 
@@ -13,13 +13,13 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    share = get_package_share_directory("solid_ros")
+    share = get_package_share_directory("solid_multi_session")
     return LaunchDescription([
         DeclareLaunchArgument("sessions", description="session folders, space separated; first = central"),
-        DeclareLaunchArgument("config", default_value=os.path.join(share, "config", "multi_session", "lidar.yaml")),
+        DeclareLaunchArgument("config", default_value=os.path.join(share, "config", "lidar.yaml")),
         DeclareLaunchArgument("save_dir", default_value=""),
         DeclareLaunchArgument("rviz", default_value="true"),
-        Node(package="solid_ros", executable="align_node", name="solid_multi_session",
+        Node(package="solid_multi_session", executable="align_node", name="solid_multi_session",
              output="screen",
              parameters=[{"sessions": LaunchConfiguration("sessions"),
                           "config": LaunchConfiguration("config"),

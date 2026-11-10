@@ -3,7 +3,7 @@ project(solid_ros)
 
 # Thin ROS 1 wrappers around the SOLiD library (cpp/):
 #   solid_node : keyframes, SOLiD loop candidates, online loop closing (solid::slam + solid::backend)
-#   align_node : multi-session alignment of saved sessions (solid::backend)
+#   (multi-session alignment: tools/multi-session-slam, package solid_multi_session)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 # The SOLiD library: an installed copy (find_package) or this repository's cpp/.
 find_package(solid 2.0 CONFIG QUIET COMPONENTS slam backend)
-if(NOT solid_FOUND)
+if(NOT solid_FOUND AND NOT TARGET solid::backend)
   set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
   set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)
   set(SOLID_BUILD_BACKEND ON CACHE BOOL "" FORCE)
@@ -35,9 +35,5 @@ target_link_libraries(solid_node solid::backend ${catkin_LIBRARIES})
 add_dependencies(solid_node ${PROJECT_NAME}_generate_messages_cpp)
 target_compile_definitions(solid_node PRIVATE SOLID_CONFIG_DIR="${SOLID_CONFIG_DIR}")
 
-add_executable(align_node src/align_node.cpp)
-target_include_directories(align_node PRIVATE ${catkin_INCLUDE_DIRS})
-target_link_libraries(align_node solid::backend ${catkin_LIBRARIES})
-
-install(TARGETS solid_node align_node RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS solid_node RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 install(DIRECTORY launch rviz DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

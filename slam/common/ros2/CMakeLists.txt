@@ -18,11 +18,10 @@ find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(pcl_conversions QUIET)  # only align_node needs it
 
 # SOLiD library (cpp/): an installed copy (find_package) or this repository's tree.
 find_package(solid 2.0 CONFIG QUIET COMPONENTS slam backend)
-if(NOT solid_FOUND)
+if(NOT solid_FOUND AND NOT TARGET solid::backend)
   set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
   set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)
   set(SOLID_BUILD_BACKEND ON CACHE BOOL "" FORCE)
@@ -42,12 +41,6 @@ ament_target_dependencies(solid_node
   rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs message_filters)
 
 install(TARGETS solid_node DESTINATION lib/${PROJECT_NAME})
-if(pcl_conversions_FOUND)
-  add_executable(align_node src/align_node.cpp)
-  target_link_libraries(align_node solid::backend)
-  ament_target_dependencies(align_node rclcpp sensor_msgs visualization_msgs pcl_conversions)
-  install(TARGETS align_node DESTINATION lib/${PROJECT_NAME})
-endif()
 install(DIRECTORY launch rviz DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY ${SOLID_CONFIG_DIR}/ DESTINATION share/${PROJECT_NAME}/config)
 # Platform launch files (odometry + SOLiD), used by run.launch.py; their configs sit next to them.

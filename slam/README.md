@@ -3,12 +3,12 @@
 ```
 slam/
 ├── common/            the SOLiD front-ends every platform uses
-│   ├── ros1/          ROS 1 package solid_ros: solid_node (loop closing), align_node (multi-session)
-│   │   └── launch/    run.launch (odometry + SOLiD), solid.launch (SOLiD only), align.launch (multi-session)
+│   ├── ros1/          ROS 1 package solid_ros: solid_node (loop closing)
+│   │   └── launch/    run.launch (odometry + SOLiD), solid.launch (SOLiD only)
 │   ├── ros2/          ROS 2 package solid_ros: the same nodes
-│   │   └── launch/    run.launch.py, solid.launch.py, align.launch.py
+│   │   └── launch/    run.launch.py, solid.launch.py
 │   └── mac/           ROS-free tools: solid_loops.py (front-end), kitti_to_bag.py
-├── config/            one YAML per sensor + multi_session/  (GUIDE.md)
+├── config/            one YAML per sensor (GUIDE.md)
 ├── lidar/             cars and UGVs with a LiDAR
 ├── radar/             4D imaging radar
 ├── legged/            legged robots
@@ -50,7 +50,7 @@ slam/radar/mac/georio.sh georio_out_bag /out
 
 Notes from testing:
 - **Frames.** SOLiD needs the cloud in a z-up sensor frame and the pose of that sensor. FAST-LIO's `/Odometry` is the IMU pose: give SOLiD the raw LiDAR scan and `input.extrinsic` (LiDAR in IMU), as in `lidar/config/kimera_sparkal1.yaml`. GeoRIO's `/current_scan` and Leg-KILO's `/cloud_registered` are in the odometry frame: `input.cloud_in_world: true`.
-- **GaRLILEO** stamps `/Odometry` relative to its first IMU message; `legged/ros2/garlileo_odom_relay.py` (started by the launch file) republishes it with absolute stamps. Its TI radar gives ~30 points per scan, so `garlileo.yaml` merges 50 scans per keyframe. Its image is built on GaRLILEO's own Dockerfile (`docker build -t garlileo-deps https://github.com/ChiyunNoh/GaRLILEO.git#main:docker`) and skips `align_node`.
+- **GaRLILEO** stamps `/Odometry` relative to its first IMU message; `legged/ros2/garlileo_odom_relay.py` (started by the launch file) republishes it with absolute stamps. Its TI radar gives ~30 points per scan, so `garlileo.yaml` merges 50 scans per keyframe. Its image is built on GaRLILEO's own Dockerfile (`docker build -t garlileo-deps https://github.com/ChiyunNoh/GaRLILEO.git#main:docker`) and builds only `solid_ros`.
 - **Leg-KILO** always opens its own viewer; without a display run it under `xvfb-run -a` (installed in its image).
 - **[KILVO](https://github.com/JixinGao/KILVO)** bags carry `livox_ros_driver2` messages; ROS 1 FAST-LIO reads `livox_ros_driver`, so convert them with `humanoid/ros1/livox2_to_livox1.py`. Its Mid-360 is mounted upside down; SOLiD's elevation bins are symmetric, so only the FOV matters.
 - **KISS-ICP (ROS 1)** keeps a queue of one scan: play bags at 1x. Kimera-Multi VLP-16 clouds have no per-point time: run it with `deskew:=false`.
