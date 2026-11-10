@@ -9,6 +9,7 @@
   <a href="https://pypi.org/project/solid-descriptor/"><img src="https://img.shields.io/pypi/v/solid-descriptor?logo=pypi&logoColor=white&label=PyPI" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/ros1"><img src="https://img.shields.io/badge/ROS-Noetic-blue" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/ros2"><img src="https://img.shields.io/badge/ROS2-Humble-blue" /></a>
+  <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common"><img src="https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=white" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/mac"><img src="https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white" /></a>
   <a href="#docker"><img src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white" /></a>
   <br />
@@ -16,6 +17,9 @@
   <a href="https://ieeexplore.ieee.org/abstract/document/10629042"><img src="https://img.shields.io/badge/Paper-IEEE%20RA--L-yellow" /></a>
   <a href="https://arxiv.org/abs/2408.07330"><img src="https://img.shields.io/badge/arXiv-b33737?logo=arXiv" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
+  <br />
+  <a href="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/cpp.yml/badge.svg?branch=main" alt="C++ API" /></a>
+  <a href="https://github.com/sparolab/SOLiD/actions/workflows/python.yml"><img src="https://github.com/sparolab/SOLiD/actions/workflows/python.yml/badge.svg?branch=main" alt="Python API" /></a>
   <br />
   <a href="https://pypi.org/project/solid-descriptor/"><img src="https://readme-typing-svg.demolab.com?background=0D1117&color=22C55E&font=Fira+Code&size=14&duration=2500&pause=800&center=true&vCenter=true&width=270&height=24&lines=%24+pip+install+solid-descriptor" alt="pip install solid-descriptor" /></a>
   <br />

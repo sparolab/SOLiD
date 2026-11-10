@@ -70,8 +70,12 @@ def main():
         dc = ec.extract(pts.astype(np.float32))
         dp = ep.extract(pts)
         sr, sa = sim(dc.rsolid, dp.rsolid), sim(dc.asolid, dp.asolid)
-        nd = int(np.sum(np.abs(np.asarray(dc.rsolid) - dp.rsolid) > 1e-6) +
-                 np.sum(np.abs(np.asarray(dc.asolid) - dp.asolid) > 1e-6))
+        # A real boundary flip moves a point between bins, a change of the order of the bin
+        # weight; float rounding (compiler, SIMD summation order) stays many orders below that.
+        def flips(c, q):
+            c, q = np.asarray(c, float), np.asarray(q, float)
+            return int(np.sum(np.abs(c - q) > 1e-6 * max(np.abs(q).max(), 1.0)))
+        nd = flips(dc.rsolid, dp.rsolid) + flips(dc.asolid, dp.asolid)
         print(f"    scan {name}: cos(rsolid)={sr:.9f} cos(asolid)={sa:.9f} bins_differing={nd}")
         check(sr > 1 - 1e-6, f"rsolid ~ pure (scan {name})")
         check(sa > 1 - 1e-6, f"asolid ~ pure (scan {name})")
@@ -86,8 +90,8 @@ def main():
     yc = solid.Extractor.pose_yaw_deg(dc3.asolid, dc4.asolid)
     yp = PyExtractor.pose_yaw_deg(dp3.asolid, dp4.asolid)
     print(f"    similarity: cpp={sc:.9f} py={sp:.9f} | yaw(deg): cpp={yc:.6f} py={yp:.6f}")
-    check(abs(sc - sp) < 1e-9, "loop_similarity matches")
-    check(abs(yc - yp) < 1e-9, "pose_yaw_deg matches")
+    check(abs(sc - sp) < 1e-6, "loop_similarity matches (float32 precision)")
+    check(abs(yc - yp) < 1e-6, "pose_yaw_deg matches")
 
     # [3] Database retrieval agrees (default config).
     print("\n[3] Database retrieval (default config)")
