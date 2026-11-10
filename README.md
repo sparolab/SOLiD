@@ -193,6 +193,13 @@ All parameters are read at runtime from one YAML file per sensor (`kitti`, `oust
 
 ______________________________________________________________________
 
+## :memo: TODO
+
+- [ ] **iPhone LiDAR**: SOLiD on iPhone LiDAR scans with ARKit poses (indoor config for the ~5 m range)
+- [ ] **IMU odometry**: loop closing on top of an IMU-based odometry
+
+______________________________________________________________________
+
 ## Citation
 
 If you use SOLiD in your research, please cite our [paper](https://ieeexplore.ieee.org/abstract/document/10629042) (supplementary material: [`appendix/Appendix.pdf`](appendix/Appendix.pdf)).
