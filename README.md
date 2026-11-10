@@ -164,7 +164,7 @@ See the guides for all arguments, outputs and the odometry integrations: [Run](d
 
 ______________________________________________________________________
 
-## :earth_asia: Applications
+## :toolbox: Tools
 
 ### Multi-session SLAM
 
