@@ -8,7 +8,7 @@ version = "2.0.0"
 description = "SOLiD: Spatially Organized and Lightweight Global Descriptor (C++ core + pure-Python)"
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "GPL-3.0" }
+license = { text = "BSD-3-Clause" }
 dependencies = ["numpy", "pyyaml"]
 
 [project.urls]

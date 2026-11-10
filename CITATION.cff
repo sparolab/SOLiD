@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use SOLiD, please cite the paper below."
+title: "SOLiD: LiDAR and 4D radar place recognition, online loop closing and multi-session SLAM"
+type: software
+version: 2.0.0
+date-released: 2026-11-10
+repository-code: "https://github.com/sparolab/SOLiD"
+url: "https://sparolab.github.io/research/solid/"
+license: BSD-3-Clause
+keywords: [lidar, 4d-radar, place-recognition, loop-closure, slam, multi-session, ros, ros2]
+authors:
+  - family-names: Kim
+    given-names: Hogyun
+  - family-names: Choi
+    given-names: Jiwon
+  - family-names: Sim
+    given-names: Taehu
+  - family-names: Kim
+    given-names: Giseop
+  - family-names: Cho
+    given-names: Younggun
+preferred-citation:
+  type: article
+  title: "Narrowing Your FOV With SOLiD: Spatially Organized and Lightweight Global Descriptor for FOV-Constrained LiDAR Place Recognition"
+  authors:
+    - family-names: Kim
+      given-names: Hogyun
+    - family-names: Choi
+      given-names: Jiwon
+    - family-names: Sim
+      given-names: Taehu
+    - family-names: Kim
+      given-names: Giseop
+    - family-names: Cho
+      given-names: Younggun
+  journal: "IEEE Robotics and Automation Letters"
+  volume: 9
+  issue: 11
+  start: 9645
+  end: 9652
+  year: 2024
+  doi: "10.1109/LRA.2024.3440089"

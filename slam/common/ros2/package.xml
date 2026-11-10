@@ -4,7 +4,7 @@
   <version>2.0.0</version>
   <description>SOLiD for ROS 2: loop candidates and online loop closing (thin wrappers around the SOLiD library).</description>
   <maintainer email="hg.kim@inha.edu">Hogyun Kim</maintainer>
-  <license>GPL-3.0</license>
+  <license>BSD</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
