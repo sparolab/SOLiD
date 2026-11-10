@@ -20,7 +20,21 @@ Homepage = "https://github.com/sparolab/SOLiD"
 wheel.packages = ["python/solid"]
 cmake.version = ">=3.16"
 minimum-version = "0.8"
+# Source distribution: only what the build needs (the C++ library, the bindings, the package).
+sdist.exclude = ["/thirdparty", "/slam", "/tools", "/docker", "/fig", "/appendix", "/docs", "/.github", "*.gif", "*.png", "*.pdf"]
 
 # One-line install works from the repo root (cpp/ is in the build tree):
 #   pip install .                                  # from a clone
 #   pip install git+https://github.com/sparolab/SOLiD.git
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux* *i686* *-win32"
+test-command = "python -c \"import solid, numpy as np; d = solid.Extractor(solid.load_config('lidar_velodyne')).extract((np.random.rand(3000, 3).astype('float32') - 0.5) * 50); print(solid.__version__, solid.backend)\""
+
+[tool.cibuildwheel.linux]
+# Eigen headers for the manylinux image
+before-all = "curl -sL https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz | tar xz -C /tmp && cmake -S /tmp/eigen-3.4.0 -B /tmp/eigen-build -DBUILD_TESTING=OFF -DEIGEN_BUILD_DOC=OFF && cmake --install /tmp/eigen-build"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install eigen"
