@@ -31,4 +31,4 @@ from .config_io import list_profiles, load_config  # noqa: E402
 
 __all__ = ["Config", "Descriptor", "Candidate", "Extractor", "Database",
            "pure", "slam", "backend", "load_config", "list_profiles"]
-__version__ = "0.1.0"
+__version__ = "2.0.0"

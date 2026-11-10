@@ -21,7 +21,7 @@ find_package(Eigen3 REQUIRED)
 find_package(pcl_conversions QUIET)  # only align_node needs it
 
 # SOLiD library (cpp/): an installed copy (find_package) or this repository's tree.
-find_package(solid 0.2 CONFIG QUIET COMPONENTS slam backend)
+find_package(solid 2.0 CONFIG QUIET COMPONENTS slam backend)
 if(NOT solid_FOUND)
   set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
   set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)

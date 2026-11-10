@@ -17,7 +17,7 @@
   <a href="https://www.cvlibs.net/datasets/kitti/eval_odometry.php"><img src="https://img.shields.io/badge/Dataset-KITTI-0061FF" /></a>
   <a href="https://www.youtube.com/watch?v=4sAWWfZTwLs"><img src="https://img.shields.io/badge/YouTube-FF0000?logo=youtube&logoColor=white" /></a>
   <br />
-  <img src="fig/solid_demo.gif" alt="SOLiD closing loops online on four platforms: a car with LiDAR (KISS-ICP), 4D radar (GeoRIO), a legged robot (GaRLILEO) and a humanoid (FAST-LIO). The map builds up, the trajectory rises with time, each closed loop links back to the place it recognized, and the colored trajectory is the online pose-graph estimate next to the gray odometry." width="95%" />
+  <img src="fig/solid_demo_v2.gif" alt="SOLiD closing loops online on four platforms: a car with LiDAR (KISS-ICP), 4D radar (GeoRIO), a legged robot (GaRLILEO) and a humanoid (FAST-LIO). The map builds up, the trajectory rises with time, each closed loop links back to the place it recognized, and the colored trajectory and the map are the online pose-graph estimate at that moment, so the past trajectory snaps into place when a loop closes, next to the gray odometry." width="95%" />
   <p>
     <strong>[IEEE RA-L 2024] Narrowing your FOV with SOLiD: Spatially Organized and Lightweight<br />
     Global Descriptor for FOV-constrained LiDAR Place Recognition</strong>

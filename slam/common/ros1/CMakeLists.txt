@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_filters message_generation pcl_conversions)
 
 # The SOLiD library: an installed copy (find_package) or this repository's cpp/.
-find_package(solid 0.2 CONFIG QUIET COMPONENTS slam backend)
+find_package(solid 2.0 CONFIG QUIET COMPONENTS slam backend)
 if(NOT solid_FOUND)
   set(SOLID_USE_PCL OFF CACHE BOOL "" FORCE)
   set(BUILD_SOLID_VERIFY OFF CACHE BOOL "" FORCE)
