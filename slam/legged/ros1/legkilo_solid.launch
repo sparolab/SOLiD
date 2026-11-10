@@ -5,6 +5,7 @@
   <arg name="legkilo_config" default="$(find legkilo)/config/legkilo_go1_velodyne.yaml" />
   <arg name="solid_config" default="$(dirname)/../config/legkilo.yaml" />
   <arg name="save_dir" default="" />
+  <arg name="rviz" default="true" />
 
   <node pkg="legkilo" type="legkilo_node" name="legkilo_node" output="log"
         args="--config_file=$(arg legkilo_config)" />
@@ -14,6 +15,6 @@
     <arg name="cloud_topic" value="/cloud_registered" />
     <arg name="odom_topic" value="/Odometry" />
     <arg name="save_dir" value="$(arg save_dir)" />
-    <arg name="rviz" value="false" />
+    <arg name="rviz" value="$(arg rviz)" />
   </include>
 </launch>

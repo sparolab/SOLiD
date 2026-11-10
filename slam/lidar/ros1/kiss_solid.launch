@@ -5,6 +5,7 @@
   <arg name="topic" default="/sparkal1/lidar_points" />
   <arg name="solid_config" default="vlp16" />
   <arg name="save_dir" default="" />
+  <arg name="rviz" default="true" />
 
   <node pkg="kiss_icp" type="odometry_node" name="odometry_node" output="log">
     <remap from="pointcloud_topic" to="$(arg topic)" />
@@ -25,6 +26,6 @@
     <arg name="cloud_topic" value="/kiss/frame" />
     <arg name="odom_topic" value="/kiss/odometry" />
     <arg name="save_dir" value="$(arg save_dir)" />
-    <arg name="rviz" value="false" />
+    <arg name="rviz" value="$(arg rviz)" />
   </include>
 </launch>

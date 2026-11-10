@@ -18,6 +18,7 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 def generate_launch_description():
     legkilo_share = get_package_share_directory("legkilo")
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("legkilo_config",
                               default_value=os.path.join(legkilo_share, "config", "legkilo_go1_velodyne.yaml")),
         DeclareLaunchArgument("solid_config", default_value=os.path.join(HERE, "..", "config", "legkilo.yaml")),
@@ -31,5 +32,5 @@ def generate_launch_description():
             launch_arguments={"config": LaunchConfiguration("solid_config"),
                               "cloud_topic": "/cloud_registered", "odom_topic": "/Odometry",
                               "save_dir": LaunchConfiguration("save_dir"),
-                              "rviz": "false", "use_sim_time": "true"}.items()),
+                              "rviz": LaunchConfiguration("rviz"), "use_sim_time": "true"}.items()),
     ])

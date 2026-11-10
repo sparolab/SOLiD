@@ -1,4 +1,4 @@
-# Multi-robot SLAM
+# Distributed Multi-Robot SLAM
 
 <p align="center">
   <a href="https://github.com/sparolab/SKiD-SLAM"><img src="skid_slam_demo.gif" alt="SKiD-SLAM on the Majang (left) and planetary analog (right) datasets" width="95%" /></a>
@@ -6,4 +6,4 @@
 
 For multi-robot SLAM with SOLiD, see **[SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM)**: distributed multi-robot LiDAR SLAM that uses SOLiD for place recognition between robots, with field deployments at planetary analog sites (IEEE T-FR 2026).
 
-To merge runs of one robot recorded at different times, see [multi-session SLAM](../multi-session-slam).
+For a server that merges the robots' maps from a few exchanged scans, see [multi-robot map merging](../multi-robot-map-merging). To merge runs of one robot recorded at different times, see [multi-session SLAM](../multi-session-slam).

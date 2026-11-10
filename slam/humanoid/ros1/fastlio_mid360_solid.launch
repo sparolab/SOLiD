@@ -5,6 +5,7 @@
        convert them first with livox2_to_livox1.py (next to this file). -->
   <arg name="solid_config" default="livox_mid360" />
   <arg name="save_dir" default="" />
+  <arg name="rviz" default="true" />
 
   <include file="$(find fast_lio)/launch/mapping_mid360.launch">
     <arg name="rviz" value="false" />
@@ -15,6 +16,6 @@
     <arg name="cloud_topic" value="/cloud_registered_body" />
     <arg name="odom_topic" value="/Odometry" />
     <arg name="save_dir" value="$(arg save_dir)" />
-    <arg name="rviz" value="false" />
+    <arg name="rviz" value="$(arg rviz)" />
   </include>
 </launch>

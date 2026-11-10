@@ -14,6 +14,7 @@ from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("solid_config", default_value="livox_mid360"),
         DeclareLaunchArgument("save_dir", default_value=""),
         IncludeLaunchDescription(
@@ -27,5 +28,5 @@ def generate_launch_description():
             launch_arguments={"config": LaunchConfiguration("solid_config"),
                               "cloud_topic": "/cloud_registered_body", "odom_topic": "/Odometry",
                               "save_dir": LaunchConfiguration("save_dir"),
-                              "rviz": "false", "use_sim_time": "true"}.items()),
+                              "rviz": LaunchConfiguration("rviz"), "use_sim_time": "true"}.items()),
     ])

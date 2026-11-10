@@ -1,6 +1,8 @@
 Panels:
   - Class: rviz/Displays
     Name: Displays
+    Help Height: 0
+    Tree Height: 300
 Visualization Manager:
   Class: ""
   Displays:
@@ -8,28 +10,59 @@ Visualization Manager:
       Name: Grid
       Enabled: true
       Cell Size: 10
-      Plane Cell Count: 50
-      Color: 160; 160; 164
+      Plane Cell Count: 100
+      Color: 90; 90; 96
+      Alpha: 0.4
+    - Class: rviz/PointCloud2
+      Name: Map (loop-closed)
+      Enabled: true
+      Topic: /solid/map
+      Queue Size: 2
+      Style: Points
+      Size (Pixels): 2
+      Alpha: 0.8
+      Color Transformer: AxisColor
+      Axis: Z
+      Autocompute Value Bounds: true
+      Use rainbow: true
+      Decay Time: 0
     - Class: rviz/MarkerArray
-      Name: SOLiD loops
+      Name: Trajectory and loops
       Enabled: true
       Marker Topic: /solid/markers
-      Queue Size: 100
+      Queue Size: 10
+    - Class: rviz/Odometry
+      Name: Pose (loop-closed)
+      Enabled: true
+      Topic: /solid/odometry
+      Keep: 1
+      Position Tolerance: 0.1
+      Angle Tolerance: 0.1
+      Shape:
+        Value: Axes
+        Axes Length: 2
+        Axes Radius: 0.3
   Global Options:
-    Background Color: 30; 30; 30
-    Fixed Frame: odom
+    Background Color: 25; 25; 30
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:
     - Class: rviz/MoveCamera
+    - Class: rviz/Interact
+  Value: true
   Views:
     Current:
-      Class: rviz/TopDownOrtho
+      Class: rviz/Orbit
       Name: Current View
-      Scale: 2
-      X: 0
-      Y: 0
-  Value: true
+      Distance: 250
+      Pitch: 0.9
+      Yaw: 3.9
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Target Frame: <Fixed Frame>
 Window Geometry:
   Height: 900
-  Width: 1200
+  Width: 1400

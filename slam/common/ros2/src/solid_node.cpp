@@ -6,7 +6,10 @@
 //   out: solid/loop_candidates (solid_ros/LoopCandidate), solid/markers (MarkerArray)
 //        with loop_closing.enable (online, solid::backend::LoopCloser):
 //        solid/odometry (corrected, every scan), solid/path (corrected keyframes)
+//        solid/map (PointCloud2: the keyframe clouds at their corrected poses, frame map)
+//        TF map -> <odometry frame> (the loop-closing correction; identity without loop closing)
 #include <chrono>
+#include <cstring>
 #include <memory>
 #include <string>
 #include <vector>
@@ -17,13 +20,16 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <nav_msgs/msg/path.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include "solid/backend/loop_closer.hpp"
 #include "solid/backend/params_yaml.hpp"
 #include "solid_ros/msg/loop_candidate.hpp"
 #include "solid/slam/config_yaml.hpp"
+#include "solid/slam/keyframe_map.hpp"
 #include "solid/slam/loop_detector.hpp"
 #include "solid/slam/session_writer.hpp"
 
@@ -70,6 +76,11 @@ class SolidNode : public rclcpp::Node {
   SolidNode() : Node("solid") {
     const std::string config = declare_parameter<std::string>("config", "");
     save_dir_ = declare_parameter<std::string>("save_dir", "");
+    const double map_voxel = declare_parameter<double>("map_voxel", 0.5);  // leaf (m) per keyframe
+    map_period_ = declare_parameter<double>("map_period", 2.0);  // s between map updates (and after every loop)
+    publish_tf_ = declare_parameter<bool>("publish_tf", true);   // map -> odometry frame
+    kmap_ = std::make_unique<solid::slam::KeyframeMap>(static_cast<float>(map_voxel));
+    tf_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
     if (config.empty()) throw std::runtime_error("parameter 'config' is empty");
     params_ = solid::slam::load_params(config);
     detector_ = std::make_unique<solid::slam::LoopDetector>(params_);
@@ -84,6 +95,7 @@ class SolidNode : public rclcpp::Node {
     pub_loops_ = create_publisher<solid_ros::msg::LoopCandidate>("solid/loop_candidates", 100);
     pub_markers_ = create_publisher<visualization_msgs::msg::MarkerArray>(
         "solid/markers", rclcpp::QoS(1).transient_local());
+    pub_map_ = create_publisher<Cloud>("solid/map", rclcpp::QoS(1).transient_local());
 
     // Best effort matches both sensor drivers and bag playback; a deep queue avoids drops.
     auto qos = rclcpp::SensorDataQoS().get_rmw_qos_profile();
@@ -114,6 +126,19 @@ class SolidNode : public rclcpp::Node {
  private:
   void callback(const Cloud::ConstSharedPtr& cloud, const Odom::ConstSharedPtr& odom) {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
+    odom_frame_ = odom->header.frame_id;
+    if (publish_tf_ && odom_frame_ != "map") {  // map -> odometry frame
+      geometry_msgs::msg::TransformStamped tf;
+      tf.header.stamp = odom->header.stamp;
+      tf.header.frame_id = "map";
+      tf.child_frame_id = odom_frame_;
+      const auto c = to_msg(closer_ ? closer_->correction() : Eigen::Isometry3d::Identity());
+      tf.transform.translation.x = c.position.x;
+      tf.transform.translation.y = c.position.y;
+      tf.transform.translation.z = c.position.z;
+      tf.transform.rotation = c.orientation;
+      tf_->sendTransform(tf);
+    }
     if (closer_) {  // corrected odometry for every scan
       Odom o = *odom;
       o.header.frame_id = "map";
@@ -158,6 +183,7 @@ class SolidNode : public rclcpp::Node {
     const std::size_t kf_id = detector_->keyframes().back().id;
     session_->add_keyframe(kf_id, detector_->last_points(), detector_->last_intensity(),
                            detector_->last_descriptor());
+    kmap_->add(detector_->last_points(), &detector_->last_intensity());
     std::vector<solid::backend::LoopResult> checked;
     if (closer_) {  // online loop closing: GICP check + iSAM2 update
       solid::backend::LoopCloser::Cloud scan;
@@ -201,7 +227,53 @@ class SolidNode : public rclcpp::Node {
       RCLCPP_INFO(get_logger(), "[solid] loop %u -> %u score %.3f yaw %.1f deg (%.1f ms)",
                   msg.query_id, msg.match_id, l.score, l.yaw_rad * 180.0 / M_PI, ms);
     }
-    publish_markers(odom->header.frame_id, cloud->header.stamp);
+    publish_markers(cloud->header.stamp);
+    bool closed = false;
+    for (const auto& c : checked) closed = closed || c.accepted;
+    const auto now = std::chrono::steady_clock::now();
+    if (closed || std::chrono::duration<double>(now - last_map_).count() >= map_period_) {
+      publish_map(cloud->header.stamp);
+      last_map_ = now;
+    }
+  }
+
+  // Keyframe poses as they are known now: loop-closed (map frame) or odometry (odometry frame).
+  const std::vector<Eigen::Isometry3d>& current_poses() {
+    if (closer_) return closer_->poses();
+    kf_poses_.clear();
+    for (const auto& k : detector_->keyframes()) kf_poses_.push_back(k.pose);
+    return kf_poses_;
+  }
+  std::string map_frame() const { return closer_ || odom_frame_.empty() ? "map" : odom_frame_; }
+
+  void publish_map(const builtin_interfaces::msg::Time& stamp) {
+    if (pub_map_->get_subscription_count() == 0) return;  // e.g. no RViz: skip the work
+    std::vector<Eigen::Vector3f> pts;
+    std::vector<float> in;
+    kmap_->build(current_poses(), pts, &in);
+    Cloud m;
+    m.header.stamp = stamp;
+    m.header.frame_id = map_frame();
+    m.height = 1;
+    m.width = static_cast<uint32_t>(pts.size());
+    const char* names[4] = {"x", "y", "z", "intensity"};
+    for (int i = 0; i < 4; ++i) {
+      sensor_msgs::msg::PointField f;
+      f.name = names[i];
+      f.offset = 4 * i;
+      f.datatype = sensor_msgs::msg::PointField::FLOAT32;
+      f.count = 1;
+      m.fields.push_back(f);
+    }
+    m.point_step = 16;
+    m.row_step = m.point_step * m.width;
+    m.is_dense = true;
+    m.data.resize(m.row_step);
+    for (std::size_t i = 0; i < pts.size(); ++i) {
+      const float v[4] = {pts[i].x(), pts[i].y(), pts[i].z(), in[i]};
+      std::memcpy(&m.data[i * 16], v, 16);
+    }
+    pub_map_->publish(m);
   }
 
   void publish_path(const builtin_interfaces::msg::Time& stamp) {
@@ -219,7 +291,8 @@ class SolidNode : public rclcpp::Node {
     pub_path_->publish(path);
   }
 
-  void publish_markers(const std::string& frame, const builtin_interfaces::msg::Time& stamp) {
+  void publish_markers(const builtin_interfaces::msg::Time& stamp) {
+    const std::string frame = map_frame();
     using visualization_msgs::msg::Marker;
     visualization_msgs::msg::MarkerArray arr;
     Marker path, lines;
@@ -232,18 +305,25 @@ class SolidNode : public rclcpp::Node {
     path.pose.orientation.w = lines.pose.orientation.w = 1.0;
     path.scale.x = 0.3;
     lines.scale.x = 0.3;
-    path.color.r = path.color.g = path.color.b = 0.6f;
+    path.color.r = 0.2f;
+    path.color.g = 0.85f;
+    path.color.b = 0.45f;
     path.color.a = 1.0f;
     lines.color.r = 0.9f;
     lines.color.g = 0.15f;
     lines.color.b = 0.15f;
     lines.color.a = 1.0f;
-    const auto& kfs = detector_->keyframes();
-    for (const auto& k : kfs) path.points.push_back(to_msg(k.pose).position);
-    for (const auto& l : detector_->loops()) {
-      lines.points.push_back(to_msg(kfs[l.query_id].pose).position);
-      lines.points.push_back(to_msg(kfs[l.match_id].pose).position);
-    }
+    const auto& poses = current_poses();
+    for (const auto& T : poses) path.points.push_back(to_msg(T).position);
+    auto line = [&](std::size_t a, std::size_t b) {
+      if (a >= poses.size() || b >= poses.size()) return;
+      lines.points.push_back(to_msg(poses[a]).position);
+      lines.points.push_back(to_msg(poses[b]).position);
+    };
+    if (closer_)
+      for (const auto& v : verified_) line(v.to, v.from);  // accepted loops only
+    else
+      for (const auto& l : detector_->loops()) line(l.query_id, l.match_id);
     arr.markers.push_back(path);
     if (!lines.points.empty()) arr.markers.push_back(lines);
     pub_markers_->publish(arr);
@@ -257,6 +337,14 @@ class SolidNode : public rclcpp::Node {
   std::string save_dir_;
   std::vector<Eigen::Vector3f> pts_;
   std::vector<float> w_, intensity_;
+  std::unique_ptr<solid::slam::KeyframeMap> kmap_;
+  std::vector<Eigen::Isometry3d> kf_poses_;
+  std::string odom_frame_;
+  double map_period_ = 2.0;
+  bool publish_tf_ = true;
+  std::chrono::steady_clock::time_point last_map_{};
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_;
+  rclcpp::Publisher<Cloud>::SharedPtr pub_map_;
 
   rclcpp::Publisher<solid_ros::msg::LoopCandidate>::SharedPtr pub_loops_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pub_markers_;

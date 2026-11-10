@@ -16,6 +16,7 @@ find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(tf2_ros REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -38,7 +39,7 @@ rosidl_get_typesupport_target(SOLID_MSGS ${PROJECT_NAME} rosidl_typesupport_cpp)
 add_executable(solid_node src/solid_node.cpp)
 target_link_libraries(solid_node solid::backend ${SOLID_MSGS})
 ament_target_dependencies(solid_node
-  rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs message_filters)
+  rclcpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs message_filters tf2_ros)
 
 install(TARGETS solid_node DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch rviz DESTINATION share/${PROJECT_NAME})

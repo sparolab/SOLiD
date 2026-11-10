@@ -21,6 +21,7 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 def generate_launch_description():
     georio_share = get_package_share_directory("geo_rio")
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("georio_config",
                               default_value=os.path.join(georio_share, "config", "config_snail.yaml")),
         DeclareLaunchArgument("solid_config", default_value=os.path.join(HERE, "..", "config", "georio.yaml")),
@@ -33,5 +34,5 @@ def generate_launch_description():
             launch_arguments={"config": LaunchConfiguration("solid_config"),
                               "cloud_topic": "/current_scan", "odom_topic": "/odometry_georio",
                               "save_dir": LaunchConfiguration("save_dir"),
-                              "rviz": "false", "use_sim_time": "false"}.items()),
+                              "rviz": LaunchConfiguration("rviz"), "use_sim_time": "false"}.items()),
     ])

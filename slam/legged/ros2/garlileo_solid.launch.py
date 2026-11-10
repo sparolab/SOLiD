@@ -22,6 +22,7 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 def generate_launch_description():
     garlileo_share = get_package_share_directory("garlileo")
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("garlileo_config",
                               default_value=os.path.join(garlileo_share, "dataset", "GaRLILEO", "config.yaml")),
         DeclareLaunchArgument("solid_config", default_value=os.path.join(HERE, "..", "config", "garlileo.yaml")),
@@ -38,5 +39,5 @@ def generate_launch_description():
                               "cloud_topic": "/ti_mmwave/radar_scan_pcl_0",
                               "odom_topic": "/garlileo/odometry",
                               "save_dir": LaunchConfiguration("save_dir"),
-                              "rviz": "false", "use_sim_time": "true"}.items()),
+                              "rviz": LaunchConfiguration("rviz"), "use_sim_time": "true"}.items()),
     ])

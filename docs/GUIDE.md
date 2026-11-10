@@ -7,7 +7,7 @@ Everything below runs the same C++ library ([`cpp/`](../cpp)): the ROS 1 and ROS
 With one of the bundled odometries (git submodules in [`thirdparty/`](../thirdparty)):
 
 ```bash
-roslaunch solid_ros run.launch odometry:=fast_lio save_dir:=$HOME/solid_results       # fast_lio, kiss_icp, legkilo, fast_lio_mid360
+roslaunch solid_ros run.launch odometry:=fast_lio save_dir:=$HOME/solid_results       # fast_lio, kiss_icp, legkilo, fast_lio_mid360 (rviz:=false to skip RViz)
 ros2 launch solid_ros run.launch.py odometry:=georio save_dir:=$HOME/solid_results    # + georio, garlileo
 ```
 
@@ -28,7 +28,8 @@ ros2 launch solid_ros solid.launch.py config:=kitti cloud_topic:=/cloud odom_top
 | `cloud_topic` | `/cloud` | `sensor_msgs/PointCloud2` in the sensor frame (or set `input.cloud_in_world`) |
 | `odom_topic` | `/odom` | `nav_msgs/Odometry` of the body; `input.extrinsic` gives the sensor in the body frame |
 | `save_dir` | empty | where to save the session on exit |
-| `rviz` | `true` | open RViz |
+| `rviz` | `true` | open RViz: loop-closed map, trajectory, loops and pose (`run.launch` too) |
+| `map_voxel`, `map_period` (node params) | `0.5`, `2.0` | leaf (m) of the published map per keyframe, seconds between map updates |
 | `use_sim_time` (ROS 2) | `true` | |
 
 | Output (ROS 1: `~`, ROS 2: `solid/`) | Type | |
@@ -36,7 +37,9 @@ ros2 launch solid_ros solid.launch.py config:=kitti cloud_topic:=/cloud odom_top
 | `odometry` | `nav_msgs/Odometry` | the input odometry corrected by the pose graph, for every scan (frame `map`) |
 | `path` | `nav_msgs/Path` | corrected keyframe poses |
 | `loop_candidates` | `solid_ros/LoopCandidate` | accepted loops: keyframe ids, stamps, poses, SOLiD score and yaw, GICP relative pose |
-| `markers` | `visualization_msgs/MarkerArray` | keyframes and loops for RViz |
+| `markers` | `visualization_msgs/MarkerArray` | loop-closed keyframe trajectory and accepted loops (frame `map`) |
+| `map` | `sensor_msgs/PointCloud2` | the keyframe clouds at their loop-closed poses (frame `map`, updated every `map_period` s and after every loop; only while someone subscribes) |
+| TF `map` → odometry frame | | the loop-closing correction, so the odometry's own clouds line up with the map in RViz (`publish_tf`) |
 
 With `loop_closing.enable: false` in the config, the node only proposes candidates (all of them, `verified: false`) for your own back-end.
 

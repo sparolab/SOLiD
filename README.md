@@ -39,7 +39,7 @@ A robot recognizes where it has been before, even when its sensor sees only a na
 - :satellite: **Any range sensor**: spinning or solid-state LiDAR, and sparse 4D radar through submaps of consecutive scans.
 - :repeat: **Online loop closing**: candidates are checked with GICP and added to an iSAM2 pose graph while the robot runs.
 - :world_map: **Multi-session SLAM**: sessions from different days are aligned into one map ([guide](tools/multi-session-slam)).
-- :busts_in_silhouette: **Multi-robot SLAM**: robots share SOLiD descriptors to merge their maps, in [SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM) ([more](tools/multi-robot-slam)).
+- :busts_in_silhouette: **Multi-robot**: map merging from a few exchanged scans ([Commerge](https://github.com/sparolab/Commerge)) and distributed multi-robot SLAM ([SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM)).
 
 <p align="center">
   <picture>
@@ -186,11 +186,19 @@ tools/multi-session-slam/mac/align.sh $HOME/aligned $HOME/day1 $HOME/day2    # m
 
 See the [multi-session SLAM guide](tools/multi-session-slam) for all arguments, outputs, results and the configuration.
 
-### Multi-robot SLAM
+### Multi-Robot Map Merging
 
-Robots share SOLiD descriptors to recognize where their maps overlap and merge them into one:
+Each robot sends its SOLiD descriptors to a server, which picks the few scans that carry the overlap; only those are exchanged, registered and merged:
 
-<p align="center"><a href="https://github.com/sparolab/SKiD-SLAM"><img src="tools/multi-robot-slam/skid_slam_demo.gif" alt="SKiD-SLAM: distributed multi-robot LiDAR SLAM with SOLiD place recognition, on the Majang (left) and planetary analog (right) datasets" width="95%" /></a></p>
+<p align="center"><a href="https://github.com/sparolab/Commerge"><img src="tools/multi-robot-map-merging/commerge_demo.gif" alt="Commerge: the SOLiD affinity of two robots goes through sequential matching, a balanced minimum vertex cover and a maximum edge-weighted clique; only one region's scans are exchanged and the maps merge" width="95%" /></a></p>
+
+See **[Commerge](https://github.com/sparolab/Commerge)** (IJRR 2026): it reads the sessions SOLiD saves, `commerge robot_a/ robot_b/ --out merged/`.
+
+### Distributed Multi-Robot SLAM
+
+Robots share SOLiD descriptors peer to peer to recognize where their maps overlap and merge them into one:
+
+<p align="center"><a href="https://github.com/sparolab/SKiD-SLAM"><img src="tools/distributed-multi-robot-slam/skid_slam_demo.gif" alt="SKiD-SLAM: distributed multi-robot LiDAR SLAM with SOLiD place recognition, on the Majang (left) and planetary analog (right) datasets" width="95%" /></a></p>
 
 See **[SKiD-SLAM](https://github.com/sparolab/SKiD-SLAM)** (IEEE T-FR 2026): distributed multi-robot LiDAR SLAM built on SOLiD, with field deployments at planetary analog sites.
 

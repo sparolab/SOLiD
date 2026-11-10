@@ -28,7 +28,8 @@ def _include(context):
     if name not in ODOMETRY:
         raise RuntimeError(f"odometry '{name}' is not one of {sorted(ODOMETRY)}")
     path = os.path.join(get_package_share_directory("solid_ros"), "platforms", ODOMETRY[name])
-    args = {"save_dir": LaunchConfiguration("save_dir").perform(context)}
+    args = {"save_dir": LaunchConfiguration("save_dir").perform(context),
+            "rviz": LaunchConfiguration("rviz").perform(context)}
     return [IncludeLaunchDescription(PythonLaunchDescriptionSource(path), launch_arguments=args.items())]
 
 
@@ -36,5 +37,6 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument("odometry", default_value="fast_lio", description=" | ".join(ODOMETRY)),
         DeclareLaunchArgument("save_dir", default_value=""),
+        DeclareLaunchArgument("rviz", default_value="true", description="SOLiD view in RViz"),
         OpaqueFunction(function=_include),
     ])

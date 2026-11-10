@@ -19,6 +19,7 @@ HERE = os.path.dirname(os.path.realpath(__file__))
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("fastlio_config", default_value="fast_lio_kimera_sparkal1.yaml"),
         DeclareLaunchArgument("solid_config", default_value=os.path.join(HERE, "..", "config", "kimera_sparkal1.yaml")),
         DeclareLaunchArgument("cloud_topic", default_value="/sparkal1/lidar_points"),
@@ -35,5 +36,5 @@ def generate_launch_description():
             launch_arguments={"config": LaunchConfiguration("solid_config"),
                               "cloud_topic": LaunchConfiguration("cloud_topic"), "odom_topic": "/Odometry",
                               "save_dir": LaunchConfiguration("save_dir"),
-                              "rviz": "false", "use_sim_time": "true"}.items()),
+                              "rviz": LaunchConfiguration("rviz"), "use_sim_time": "true"}.items()),
     ])

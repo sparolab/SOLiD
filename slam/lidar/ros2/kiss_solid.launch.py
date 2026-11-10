@@ -37,8 +37,9 @@ def generate_launch_description():
             "config": LaunchConfiguration("solid_config"),
             "cloud_topic": "/kiss/frame", "odom_topic": "/kiss/odometry",
             "save_dir": LaunchConfiguration("save_dir"),
-            "rviz": "false", "use_sim_time": "true"}.items())
+            "rviz": LaunchConfiguration("rviz"), "use_sim_time": "true"}.items())
     return LaunchDescription([
+        DeclareLaunchArgument("rviz", default_value="true"),  # SOLiD view: loop-closed map, trajectory, loops
         DeclareLaunchArgument("topic", default_value="/sparkal1/lidar_points"),
         DeclareLaunchArgument("solid_config",
                               default_value="vlp16"),

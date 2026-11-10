@@ -38,6 +38,7 @@ def _nodes(context):
             executable="rviz2",
             name="solid_rviz",
             arguments=["-d", os.path.join(share, "rviz", "solid.rviz")],
+            parameters=[{"use_sim_time": LaunchConfiguration("use_sim_time")}],
             condition=IfCondition(LaunchConfiguration("rviz")),
         ),
     ]

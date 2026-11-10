@@ -8,6 +8,7 @@
   <arg name="cloud_topic" default="/sparkal1/lidar_points" />
   <arg name="odom_topic" default="/Odometry" />
   <arg name="save_dir" default="" />
+  <arg name="rviz" default="true" />
 
   <rosparam command="load" file="$(arg fastlio_config)" />
   <param name="feature_extract_enable" type="bool" value="0" />
@@ -24,6 +25,6 @@
     <arg name="cloud_topic" value="$(arg cloud_topic)" />
     <arg name="odom_topic" value="$(arg odom_topic)" />
     <arg name="save_dir" value="$(arg save_dir)" />
-    <arg name="rviz" value="false" />
+    <arg name="rviz" value="$(arg rviz)" />
   </include>
 </launch>

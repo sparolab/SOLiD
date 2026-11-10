@@ -6,7 +6,10 @@
 //   out: ~loop_candidates (solid_ros/LoopCandidate), ~markers (visualization_msgs/MarkerArray)
 //        with loop_closing.enable (online, solid::backend::LoopCloser):
 //        ~odometry (corrected nav_msgs/Odometry, every scan), ~path (corrected keyframes)
+//        ~map (sensor_msgs/PointCloud2: the keyframe clouds at their corrected poses, frame map)
+//        TF map -> <odometry frame> (the loop-closing correction; identity without loop closing)
 #include <memory>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -16,13 +19,16 @@
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
 #include <ros/ros.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <tf2_ros/transform_broadcaster.h>
 #include <visualization_msgs/MarkerArray.h>
 
 #include "solid/backend/loop_closer.hpp"
 #include "solid/backend/params_yaml.hpp"
 #include "solid_ros/LoopCandidate.h"
 #include "solid/slam/config_yaml.hpp"
+#include "solid/slam/keyframe_map.hpp"
 #include "solid/slam/loop_detector.hpp"
 #include "solid/slam/session_writer.hpp"
 
@@ -60,6 +66,11 @@ class SolidNode {
     std::string config;
     pnh.param<std::string>("config", config, std::string(SOLID_CONFIG_DIR) + "/kitti.yaml");
     pnh.param<std::string>("save_dir", save_dir_, "");
+    double map_voxel = 0.5;
+    pnh.param("map_voxel", map_voxel, 0.5);         // leaf (m) of the published map, per keyframe
+    pnh.param("map_period", map_period_, 2.0);      // s between map updates (and after every loop)
+    pnh.param("publish_tf", publish_tf_, true);     // map -> odometry frame
+    kmap_ = std::make_unique<solid::slam::KeyframeMap>(static_cast<float>(map_voxel));
     params_ = solid::slam::load_params(config);
     detector_ = std::make_unique<solid::slam::LoopDetector>(params_);
     session_ = std::make_unique<solid::slam::SessionWriter>(save_dir_);
@@ -72,6 +83,7 @@ class SolidNode {
 
     pub_loops_ = pnh.advertise<solid_ros::LoopCandidate>("loop_candidates", 100);
     pub_markers_ = pnh.advertise<visualization_msgs::MarkerArray>("markers", 1, true);
+    pub_map_ = pnh.advertise<sensor_msgs::PointCloud2>("map", 1, true);
 
     sub_cloud_.subscribe(nh, "cloud", 10);
     sub_odom_.subscribe(nh, "odom", 100);
@@ -99,6 +111,19 @@ class SolidNode {
   void callback(const sensor_msgs::PointCloud2::ConstPtr& cloud,
                 const nav_msgs::Odometry::ConstPtr& odom) {
     const Eigen::Isometry3d pose = to_eigen(odom->pose.pose);
+    odom_frame_ = odom->header.frame_id;
+    if (publish_tf_ && odom_frame_ != "map") {  // map -> odometry frame
+      geometry_msgs::TransformStamped tf;
+      tf.header.stamp = odom->header.stamp;
+      tf.header.frame_id = "map";
+      tf.child_frame_id = odom_frame_;
+      const geometry_msgs::Pose c = to_msg(closer_ ? closer_->correction() : Eigen::Isometry3d::Identity());
+      tf.transform.translation.x = c.position.x;
+      tf.transform.translation.y = c.position.y;
+      tf.transform.translation.z = c.position.z;
+      tf.transform.rotation = c.orientation;
+      tf_.sendTransform(tf);
+    }
     if (closer_) {  // corrected odometry for every scan
       nav_msgs::Odometry o = *odom;
       o.header.frame_id = "map";
@@ -142,6 +167,7 @@ class SolidNode {
     const std::size_t kf_id = detector_->keyframes().back().id;
     session_->add_keyframe(kf_id, detector_->last_points(), detector_->last_intensity(),
                            detector_->last_descriptor());
+    kmap_->add(detector_->last_points(), &detector_->last_intensity());
     std::vector<solid::backend::LoopResult> checked;
     if (closer_) {  // online loop closing: GICP check + iSAM2 update
       solid::backend::LoopCloser::Cloud scan;
@@ -184,7 +210,53 @@ class SolidNode {
       ROS_INFO("[solid] loop %u -> %u score %.3f yaw %.1f deg (%.1f ms)", msg.query_id,
                msg.match_id, l.score, l.yaw_rad * 180.0 / M_PI, ms);
     }
-    publish_markers(odom->header.frame_id, cloud->header.stamp);
+    publish_markers(cloud->header.stamp);
+    bool closed = false;
+    for (const auto& c : checked) closed = closed || c.accepted;
+    const ros::WallTime now = ros::WallTime::now();
+    if (closed || (now - last_map_).toSec() >= map_period_) {
+      publish_map(cloud->header.stamp);
+      last_map_ = now;
+    }
+  }
+
+  // Keyframe poses as they are known now: loop-closed (map frame) or odometry (odometry frame).
+  const std::vector<Eigen::Isometry3d>& current_poses() {
+    if (closer_) return closer_->poses();
+    kf_poses_.clear();
+    for (const auto& k : detector_->keyframes()) kf_poses_.push_back(k.pose);
+    return kf_poses_;
+  }
+  std::string map_frame() const { return closer_ || odom_frame_.empty() ? "map" : odom_frame_; }
+
+  void publish_map(const ros::Time& stamp) {
+    if (pub_map_.getNumSubscribers() == 0) return;  // e.g. no RViz: skip the work
+    std::vector<Eigen::Vector3f> pts;
+    std::vector<float> in;
+    kmap_->build(current_poses(), pts, &in);
+    sensor_msgs::PointCloud2 m;
+    m.header.stamp = stamp;
+    m.header.frame_id = map_frame();
+    m.height = 1;
+    m.width = static_cast<uint32_t>(pts.size());
+    const char* names[4] = {"x", "y", "z", "intensity"};
+    for (int i = 0; i < 4; ++i) {
+      sensor_msgs::PointField f;
+      f.name = names[i];
+      f.offset = 4 * i;
+      f.datatype = sensor_msgs::PointField::FLOAT32;
+      f.count = 1;
+      m.fields.push_back(f);
+    }
+    m.point_step = 16;
+    m.row_step = m.point_step * m.width;
+    m.is_dense = true;
+    m.data.resize(m.row_step);
+    for (std::size_t i = 0; i < pts.size(); ++i) {
+      const float v[4] = {pts[i].x(), pts[i].y(), pts[i].z(), in[i]};
+      std::memcpy(&m.data[i * 16], v, 16);
+    }
+    pub_map_.publish(m);
   }
 
   void publish_path(const ros::Time& stamp) {
@@ -202,7 +274,8 @@ class SolidNode {
     pub_path_.publish(path);
   }
 
-  void publish_markers(const std::string& frame, const ros::Time& stamp) {
+  void publish_markers(const ros::Time& stamp) {
+    const std::string frame = map_frame();
     visualization_msgs::MarkerArray arr;
     visualization_msgs::Marker path, lines;
     path.header.frame_id = lines.header.frame_id = frame;
@@ -214,18 +287,25 @@ class SolidNode {
     path.pose.orientation.w = lines.pose.orientation.w = 1.0;
     path.scale.x = 0.3;
     lines.scale.x = 0.3;
-    path.color.r = path.color.g = path.color.b = 0.6f;
+    path.color.r = 0.2f;
+    path.color.g = 0.85f;
+    path.color.b = 0.45f;
     path.color.a = 1.0f;
     lines.color.r = 0.9f;
     lines.color.g = 0.15f;
     lines.color.b = 0.15f;
     lines.color.a = 1.0f;
-    const auto& kfs = detector_->keyframes();
-    for (const auto& k : kfs) path.points.push_back(to_msg(k.pose).position);
-    for (const auto& l : detector_->loops()) {
-      lines.points.push_back(to_msg(kfs[l.query_id].pose).position);
-      lines.points.push_back(to_msg(kfs[l.match_id].pose).position);
-    }
+    const auto& poses = current_poses();
+    for (const auto& T : poses) path.points.push_back(to_msg(T).position);
+    auto line = [&](std::size_t a, std::size_t b) {
+      if (a >= poses.size() || b >= poses.size()) return;
+      lines.points.push_back(to_msg(poses[a]).position);
+      lines.points.push_back(to_msg(poses[b]).position);
+    };
+    if (closer_)
+      for (const auto& v : verified_) line(v.to, v.from);  // accepted loops only
+    else
+      for (const auto& l : detector_->loops()) line(l.query_id, l.match_id);
     arr.markers.push_back(path);
     if (!lines.points.empty()) arr.markers.push_back(lines);
     pub_markers_.publish(arr);
@@ -239,8 +319,15 @@ class SolidNode {
   std::string save_dir_;
   std::vector<Eigen::Vector3f> pts_;
   std::vector<float> w_, intensity_;
+  std::unique_ptr<solid::slam::KeyframeMap> kmap_;
+  std::vector<Eigen::Isometry3d> kf_poses_;
+  std::string odom_frame_;
+  double map_period_ = 2.0;
+  bool publish_tf_ = true;
+  ros::WallTime last_map_;
+  tf2_ros::TransformBroadcaster tf_;
 
-  ros::Publisher pub_loops_, pub_markers_, pub_odom_, pub_path_;
+  ros::Publisher pub_loops_, pub_markers_, pub_odom_, pub_path_, pub_map_;
   message_filters::Subscriber<sensor_msgs::PointCloud2> sub_cloud_;
   message_filters::Subscriber<nav_msgs::Odometry> sub_odom_;
   std::unique_ptr<message_filters::Synchronizer<SyncPolicy>> sync_;

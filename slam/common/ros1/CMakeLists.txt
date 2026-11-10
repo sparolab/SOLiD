@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(catkin REQUIRED COMPONENTS
-  roscpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs
+  roscpp std_msgs geometry_msgs nav_msgs sensor_msgs visualization_msgs tf2_ros
   message_filters message_generation pcl_conversions)
 
 # The SOLiD library: an installed copy (find_package) or this repository's cpp/.
