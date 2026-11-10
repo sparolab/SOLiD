@@ -6,6 +6,7 @@
   <br />
   <a href="https://github.com/sparolab/SOLiD/tree/main/cpp"><img src="https://img.shields.io/badge/-C++-blue?logo=cplusplus" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/python"><img src="https://img.shields.io/badge/Python-3670A0?logo=python&logoColor=ffdd54" /></a>
+  <a href="https://pypi.org/project/solid-descriptor/"><img src="https://img.shields.io/pypi/v/solid-descriptor?logo=pypi&logoColor=white&label=PyPI" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/ros1"><img src="https://img.shields.io/badge/ROS-Noetic-blue" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/ros2"><img src="https://img.shields.io/badge/ROS2-Humble-blue" /></a>
   <a href="https://github.com/sparolab/SOLiD/tree/main/slam/common/mac"><img src="https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white" /></a>
@@ -122,7 +123,7 @@ cd ~/ros2_ws && colcon build --base-paths src/SOLiD/slam/common/ros2 src/SOLiD/t
 ```bash
 xcode-select --install && brew install cmake eigen pcl yaml-cpp
 python3 -m venv .venv && source .venv/bin/activate     # or: uv venv && source .venv/bin/activate
-pip install . rosbags matplotlib                         # front-end (Python binding)
+pip install solid-descriptor rosbags matplotlib          # front-end (Python binding, import solid; or `pip install .` from the clone)
 
 # GTSAM is not in Homebrew: build it once (tested: 4.3.0 with Homebrew Eigen 5)
 git clone --branch 4.3.0 --depth 1 https://github.com/borglab/gtsam.git ~/gtsam-src
