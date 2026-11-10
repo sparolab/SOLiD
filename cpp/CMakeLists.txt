@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(solid LANGUAGES CXX VERSION 2.0.0)
+project(solid LANGUAGES CXX VERSION 2.0.1)
 
 # SOLiD library. Everything else in this repository (ROS 1 / ROS 2 nodes, the
 # Python package, multi-session SLAM) consumes these targets:

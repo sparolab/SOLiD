@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use SOLiD, please cite the paper below."
 title: "SOLiD: LiDAR and 4D radar place recognition, online loop closing and multi-session SLAM"
 type: software
-version: 2.0.0
+version: 2.0.1
 date-released: 2026-11-10
 repository-code: "https://github.com/sparolab/SOLiD"
 url: "https://sparolab.github.io/research/solid/"
