@@ -25,7 +25,7 @@
 
 ______________________________________________________________________
 
-A robot recognizes where it has been before, even when its sensor sees only a narrow or partly blocked slice of the world, and uses it to close loops and to merge runs from different days:
+A robot recognizes where it has been before, even when its sensor sees only a narrow or partly blocked slice of the world, and uses it to close loops and to merge runs from different days and robots:
 
 - :dart: **FOV-aware**: points are binned by range, elevation and azimuth inside the sensor's real vertical field of view.
 - :compass: **Two signatures**: R-SOLiD (range) finds the place, A-SOLiD (azimuth) recovers the yaw between the two visits.
