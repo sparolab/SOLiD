@@ -48,6 +48,7 @@ ATE after a best rigid fit to the ground truth, so only the drift counts. Every 
 | --- | --- | --- | --- | --- |
 | KITTI 00 (HDL-64) | KISS-ICP (2) | 3.70 m | **1.13 m** | 418 |
 | Kimera-Multi sparkal1 (VLP-16) | FAST-LIO (1) | 1.30 m (max 3.62) | 1.29 m (max 3.61): FAST-LIO drifts little here | 15 |
+| Kimera-Multi sparkal1 (VLP-16) | KISS-ICP (1) | 9.76 m | **6.45 m**: LiDAR-only odometry drifts in height here | 22 |
 | SNAIL-Radar 20240113/data1 (ARS548) | GeoRIO (2) | 0.47 m | **0.19 m** | 132 |
 | GaRLILEO BridgeLoop (TI IWR1843, Spot) | GaRLILEO (2) | 0.37 m | **0.30 m** | 113 |
 | Leg-KILO corridor (VLP-16, Go1) | Leg-KILO (2) | 0.22 m | 0.22 m: little drift to remove | 3 |

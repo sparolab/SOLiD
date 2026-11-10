@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>solid_multi_session</name>
-  <version>2.0.1</version>
+  <version>2.1.0</version>
   <description>SOLiD multi-session SLAM for ROS 2: aligns saved sessions into one map (thin wrapper around the SOLiD library).</description>
   <maintainer email="hg.kim@inha.edu">Hogyun Kim</maintainer>
   <license>BSD</license>
