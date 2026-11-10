@@ -36,8 +36,7 @@ Each platform folder has the same layout: `ros1/` and `ros2/` (launch files that
 GeoRIO and GaRLILEO are ROS 2 only.
 
 ```bash
-# build the base image, then the odometry image
-docker build -f docker/Dockerfile.humble -t solid:humble .
+# the odometry image, on the published base ghcr.io/sparolab/solid:humble (clone with --recursive)
 docker build -f docker/slam/Dockerfile.georio.humble -t solid-georio:humble .
 
 # online: odometry + SOLiD
