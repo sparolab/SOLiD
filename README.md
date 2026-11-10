@@ -196,7 +196,7 @@ ______________________________________________________________________
 ## :memo: TODO
 
 - [ ] **iPhone LiDAR**: SOLiD on iPhone LiDAR scans with ARKit poses (indoor config for the ~5 m range)
-- [ ] **IMU odometry**: loop closing on top of an IMU-based odometry
+- [ ] **IMU odometry**: loop closing on top of an inertial odometry such as [KISS-IMU](https://github.com/sparolab/KISS-IMU)
 
 ______________________________________________________________________
 
